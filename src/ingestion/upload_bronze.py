@@ -53,7 +53,7 @@ if __name__ == "__main__":
     folder_path = Path("~/synthea/output/fhir/").expanduser()
 
     container_name = "lakehouse"
-    account_url = "https://synhealthcarelake.blob.core.windows.net"
+    account_url = "https://syntheagendata.blob.core.windows.net"
 
     credential = DefaultAzureCredential()
     blob_service_client = BlobServiceClient(account_url, credential=credential)
