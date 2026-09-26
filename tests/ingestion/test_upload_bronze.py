@@ -50,7 +50,7 @@ def test_upload_blob_file(tmp_path):
     alice_file = tmp_path / "alice.json"
     alice_file.write_text('{ "name": "alice" }')
 
-    upload_blob_file(fake_client, "lakehouse", alice_file)
+    upload_blob_file(fake_client, "lake", alice_file)
 
     assert len(fake_client.container_client.uploads) == 1
     assert fake_client.container_client.uploads[0][0] == "bronze/alice.json"

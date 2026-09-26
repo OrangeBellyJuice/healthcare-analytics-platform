@@ -49,7 +49,7 @@ def test_write_practitioner_to_silver_orchestration():
 
     write_practitioners_to_silver(
         fake_client,
-        "lakehouse",
+        "lake",
         "silver/practitioners.parquet",
         practitioners,
     )
@@ -65,7 +65,7 @@ def test_write_silver_blob():
 
     write_silver_blob(
         fake_client,
-        "lakehouse",
+        "lake",
         "practitioners.parquet",
         serialize_parquet(create_dataframe(practitioners)),
     )

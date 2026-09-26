@@ -25,7 +25,7 @@ def read_practitioner_bronze(
 
 
 if __name__ == "__main__":
-    container_name = "lakehouse"
+    container_name = "lake"
     blob_name = "bronze/practitionerInformation1790018762251.json"
     account_url = "https://syntheagendata.blob.core.windows.net"
     default_credential = DefaultAzureCredential()
