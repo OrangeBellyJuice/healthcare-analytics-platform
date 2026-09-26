@@ -1,4 +1,4 @@
-from src.transform.practitioner import (
+from src.transforms.practitioner import (
     remove_digits_end,
     title_case,
     transform_practitioner,
