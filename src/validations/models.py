@@ -3,7 +3,7 @@ from typing import Literal
 from pydantic import BaseModel
 
 
-class PractionerName(BaseModel):
+class PractitionerName(BaseModel):
     family: str
     given: list[str]
     prefix: list[str]
@@ -20,6 +20,6 @@ class PractitionerAddress(BaseModel):
 class Practitioner(BaseModel):
     resourceType: str = "Practitioner"
     id: str
-    name: list[PractionerName]
+    name: list[PractitionerName]
     address: list[PractitionerAddress]
     gender: Literal["female", "male"]
