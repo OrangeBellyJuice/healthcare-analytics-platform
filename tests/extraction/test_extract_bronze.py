@@ -1,4 +1,4 @@
-from src.extraction.read_bronze import extract_practitioner_resources
+from src.extraction.extract_bronze import extract_practitioner_resources
 
 
 def test_extract_practitioner_resources_from_bundle():
