@@ -32,7 +32,7 @@ def write_silver_blob(
     )
 
 
-def write_practitioners_to_silver(
+def load_to_silver(
     blob_service_client: BlobServiceClient,
     container_name: str,
     silver_blob_name: str,

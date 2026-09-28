@@ -2,10 +2,10 @@ import io
 
 import pandas as pd
 
-from src.loading.write_silver import (
+from src.loading.load_silver import (
     create_dataframe,
+    load_to_silver,
     serialize_parquet,
-    write_practitioners_to_silver,
     write_silver_blob,
 )
 
@@ -47,7 +47,7 @@ practitioners = [
 def test_write_practitioner_to_silver_orchestration():
     fake_client = FakeBlobServiceClient()
 
-    write_practitioners_to_silver(
+    load_to_silver(
         fake_client,
         "lake",
         "silver/practitioners.parquet",
