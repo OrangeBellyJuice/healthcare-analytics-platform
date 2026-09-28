@@ -1,6 +1,5 @@
 from json import loads
 
-from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 
 
@@ -22,15 +21,3 @@ def read_practitioner_bronze(
     bundle = loads(blob_client.download_blob().readall())
 
     return extract_practitioner_resources(bundle)
-
-
-if __name__ == "__main__":
-    container_name = "lake"
-    blob_name = "bronze/practitionerInformation1790018762251.json"
-    account_url = "https://syntheagendata.blob.core.windows.net"
-    default_credential = DefaultAzureCredential()
-    blob_service_client = BlobServiceClient(account_url, credential=default_credential)
-
-    practitioners_bronze = read_practitioner_bronze(
-        blob_service_client, container_name, blob_name
-    )
