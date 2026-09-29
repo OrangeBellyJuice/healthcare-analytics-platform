@@ -2,7 +2,7 @@ import logging
 
 from pydantic import ValidationError
 
-from src.validations.models import Practitioner, Organization
+from src.validations.models import Organization, Practitioner
 
 
 def validate_organizations(resources: list[dict]) -> list[dict]:

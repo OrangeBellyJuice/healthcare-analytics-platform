@@ -1,4 +1,4 @@
-from src.validations.validators import validate_practitioners, validate_organizations
+from src.validations.validators import validate_organizations, validate_practitioners
 
 organization_resource = [
     {
@@ -56,7 +56,7 @@ def test_validate_practitioner_for_success():
     assert results[0]["id"] == "4ac6772e-f4cd-3862-b53c-bb433031afc9"
 
 
-def test_validate_practitioners_for_failure():
+def test_validate_organizations_for_failure():
 
     bad_organization_resource = organization_resource[0]
     del bad_organization_resource["address"]

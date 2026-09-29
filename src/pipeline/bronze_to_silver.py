@@ -6,7 +6,8 @@ from azure.storage.blob import BlobServiceClient
 
 from src.extraction.extract_bronze import extract_from_bronze
 from src.loading.load_silver import load_to_silver
-from src.transforms.practitioner import transform_organizations, transform_practitioners
+from src.transforms.organization import transform_organizations
+from src.transforms.practitioner import transform_practitioners
 from src.validations.validators import validate_organizations, validate_practitioners
 
 ACCOUNT_URL = "https://syntheagendata.blob.core.windows.net"
@@ -38,7 +39,7 @@ def run_practitioner_pipeline() -> None:
     silver_blob_name = "silver/practitioners.parquet"
 
     raw_practitioners = extract_from_bronze(
-        blob_service_client, CONTAINER_NAME, bronze_blob_name
+        blob_service_client, CONTAINER_NAME, bronze_blob_name, "Practitioner"
     )
 
     valid_practitioners = validate_practitioners(raw_practitioners)
@@ -64,7 +65,7 @@ def run_organization_pipeline() -> None:
     silver_blob_name = "silver/organizations.parquet"
 
     raw_organizations = extract_from_bronze(
-        blob_service_client, CONTAINER_NAME, bronze_blob_name
+        blob_service_client, CONTAINER_NAME, bronze_blob_name, "Organization"
     )
 
     valid_organizations = validate_organizations(raw_organizations)

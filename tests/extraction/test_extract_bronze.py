@@ -1,7 +1,4 @@
-from src.extraction.extract_bronze import (
-    extract_organization_resources,
-    extract_practitioner_resources,
-)
+from src.extraction.extract_bronze import extract_resources
 
 
 def test_extract_hospital_resources_from_bundle():
@@ -27,7 +24,7 @@ def test_extract_hospital_resources_from_bundle():
         ],
     }
 
-    result = extract_organization_resources(fake_bundle)
+    result = extract_resources(fake_bundle, "Organization")
 
     assert len(result) == 1
     assert result[0]["resourceType"] == "Organization"
@@ -54,7 +51,7 @@ def test_extract_practitioner_resources_from_bundle():
         ],
     }
 
-    result = extract_practitioner_resources(fake_bundle)
+    result = extract_resources(fake_bundle, "Practitioner")
 
     assert len(result) == 2
     assert result[0]["id"] == "p1"
@@ -79,7 +76,7 @@ def test_extract_practitioner_resources_ignores_other_resources():
         ]
     }
 
-    result = extract_practitioner_resources(fake_bundle)
+    result = extract_resources(fake_bundle, "Practitioner")
 
     assert len(result) == 1
 
@@ -87,8 +84,8 @@ def test_extract_practitioner_resources_ignores_other_resources():
 def test_extract_practitioner_resources_empty_bundle():
     fake_bundle = {"entry": []}
 
-    result_practitioner = extract_practitioner_resources(fake_bundle)
-    result_organization = extract_organization_resources(fake_bundle)
+    result_practitioner = extract_resources(fake_bundle, "Practitioner")
+    result_organization = extract_resources(fake_bundle, "Organization")
 
     assert result_practitioner == []
     assert result_organization == []
