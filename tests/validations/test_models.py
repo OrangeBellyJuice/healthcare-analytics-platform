@@ -1,8 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from src.validations.models import Practitioner
-
+from src.validations.models import Organization, Practitioner
 
 valid_practitioner = {
     "resourceType": "Practitioner",
@@ -26,6 +25,30 @@ valid_practitioner = {
     "gender": "male",
 }
 
+valid_organization = {
+    "resourceType": "Organization",
+    "id": "231f25bb-2bdc-31e6-b187-3e666cb9f8fa",
+    "name": "Primecare Medical Centre",
+    "address": [
+        {
+            "line": ["201-7315 edmonds street"],
+            "city": "Burnaby",
+            "state": "BC",
+            "postalCode": "V3N 1A7",
+            "country": "CA",
+        }
+    ],
+}
+
+
+def test_valid_organization_passes_validation():
+    result = Organization.model_validate(valid_organization)
+
+    assert result.id == "231f25bb-2bdc-31e6-b187-3e666cb9f8fa"
+    assert result.resourceType == "Organization"
+    assert result.name == "Primecare Medical Centre"
+    assert result.address[0].state == "BC"
+
 
 def test_valid_practitioner_passes_validation():
     result = Practitioner.model_validate(valid_practitioner)
@@ -34,6 +57,14 @@ def test_valid_practitioner_passes_validation():
     assert result.resourceType == "Practitioner"
     assert result.name[0].family == "Schumm995"
     assert result.address[0].state == "BC"
+
+
+def test_organization_missing_name_fails_validation():
+    invalid_organization = valid_organization.copy()
+    invalid_organization.pop("name")
+
+    with pytest.raises(ValidationError):
+        Organization.model_validate(invalid_organization)
 
 
 def test_practitioner_missing_name_fails_validation():

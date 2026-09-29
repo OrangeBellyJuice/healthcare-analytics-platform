@@ -37,4 +37,4 @@ class Organization(BaseModel):
     resourceType: str = "Organization"
     id: str
     name: str
-    address: Literal[Organization]
+    address: list[OrganizationAddress]

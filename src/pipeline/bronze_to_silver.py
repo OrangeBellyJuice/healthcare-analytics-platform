@@ -6,8 +6,8 @@ from azure.storage.blob import BlobServiceClient
 
 from src.extraction.extract_bronze import extract_from_bronze
 from src.loading.load_silver import load_to_silver
-from src.transforms.practitioner import transform_practitioners
-from src.validations.validators import validate_practitioners
+from src.transforms.practitioner import transform_organizations, transform_practitioners
+from src.validations.validators import validate_organizations, validate_practitioners
 
 ACCOUNT_URL = "https://syntheagendata.blob.core.windows.net"
 CONTAINER_NAME = "lake"
@@ -52,32 +52,32 @@ def run_practitioner_pipeline() -> None:
     logger.info("Practitioner Bronze -> Silver pipeline has finished")
 
 
-def run_hospital_pipeline() -> None:
+def run_organization_pipeline() -> None:
     configure_logging()
 
     logger = logging.getLogger(__name__)
-    logger.info("Hospital Bronze -> Silver pipeline has started")
+    logger.info("Organization Bronze -> Silver pipeline has started")
 
     credential = DefaultAzureCredential()
     blob_service_client = BlobServiceClient(ACCOUNT_URL, credential=credential)
     bronze_blob_name = "bronze/hospitalInformation1790018762251.json"
-    silver_blob_name = "silver/hospitals.parquet"
+    silver_blob_name = "silver/organizations.parquet"
 
-    raw_hospitals = extract_from_bronze(
+    raw_organizations = extract_from_bronze(
         blob_service_client, CONTAINER_NAME, bronze_blob_name
     )
 
-    valid_hospitals = validate_practitioners(raw_hospitals)
+    valid_organizations = validate_organizations(raw_organizations)
 
-    clean_hospitals = transform_practitioners(valid_hospitals)
+    clean_organizations = transform_organizations(valid_organizations)
 
     load_to_silver(
-        blob_service_client, CONTAINER_NAME, silver_blob_name, clean_hospitals
+        blob_service_client, CONTAINER_NAME, silver_blob_name, clean_organizations
     )
 
-    logger.info("Hospital Bronze -> Silver pipeline has finished")
+    logger.info("Organization Bronze -> Silver pipeline has finished")
 
 
 if __name__ == "__main__":
     run_practitioner_pipeline()
-    run_hospital_pipeline()
+    run_organization_pipeline()
