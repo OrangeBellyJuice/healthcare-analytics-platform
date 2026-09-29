@@ -11,7 +11,7 @@ def extract_practitioner_resources(bundle: dict) -> list[dict]:
     ]
 
 
-def extract_bronze(
+def extract_from_bronze(
     blob_service_client: BlobServiceClient, container_name: str, blob_name: str
 ) -> list[dict]:
     blob_client = blob_service_client.get_blob_client(

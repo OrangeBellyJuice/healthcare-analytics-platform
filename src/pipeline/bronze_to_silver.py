@@ -4,7 +4,7 @@ from pathlib import Path
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 
-from src.extraction.extract_bronze import extract_bronze
+from src.extraction.extract_bronze import extract_from_bronze
 from src.loading.load_silver import load_to_silver
 from src.transforms.practitioner import transform_practitioners
 from src.validations.validators import validate_practitioners
@@ -30,7 +30,6 @@ def run_practitioner_pipeline() -> None:
     configure_logging()
 
     logger = logging.getLogger(__name__)
-
     logger.info("Practitioner Bronze -> Silver pipeline has started")
 
     credential = DefaultAzureCredential()
@@ -38,7 +37,7 @@ def run_practitioner_pipeline() -> None:
     bronze_blob_name = "bronze/practitionerInformation1790018762251.json"
     silver_blob_name = "silver/practitioners.parquet"
 
-    raw_practitioners = extract_bronze(
+    raw_practitioners = extract_from_bronze(
         blob_service_client, CONTAINER_NAME, bronze_blob_name
     )
 
@@ -53,5 +52,32 @@ def run_practitioner_pipeline() -> None:
     logger.info("Practitioner Bronze -> Silver pipeline has finished")
 
 
+def run_hospital_pipeline() -> None:
+    configure_logging()
+
+    logger = logging.getLogger(__name__)
+    logger.info("Hospital Bronze -> Silver pipeline has started")
+
+    credential = DefaultAzureCredential()
+    blob_service_client = BlobServiceClient(ACCOUNT_URL, credential=credential)
+    bronze_blob_name = "bronze/hospitalInformation1790018762251.json"
+    silver_blob_name = "silver/hospitals.parquet"
+
+    raw_hospitals = extract_from_bronze(
+        blob_service_client, CONTAINER_NAME, bronze_blob_name
+    )
+
+    valid_hospitals = validate_practitioners(raw_hospitals)
+
+    clean_hospitals = transform_practitioners(valid_hospitals)
+
+    load_to_silver(
+        blob_service_client, CONTAINER_NAME, silver_blob_name, clean_hospitals
+    )
+
+    logger.info("Hospital Bronze -> Silver pipeline has finished")
+
+
 if __name__ == "__main__":
     run_practitioner_pipeline()
+    run_hospital_pipeline()
