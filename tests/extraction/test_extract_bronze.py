@@ -1,4 +1,38 @@
-from src.extraction.extract_bronze import extract_practitioner_resources
+from src.extraction.extract_bronze import (
+    extract_hospital_resources,
+    extract_practitioner_resources,
+)
+
+
+def test_extract_hospital_resources_from_bundle():
+    fake_bundle = {
+        "resourceType": "Bundle",
+        "entry": [
+            {
+                "resource": {
+                    "resourceType": "Organization",
+                    "id": "231f25bb-2bdc-31e6-b187-3e666cb9f8fa",
+                    "name": "Primecare Medical Centre",
+                    "address": [
+                        {
+                            "line": ["201-7315 edmonds street"],
+                            "city": "Burnaby",
+                            "state": "BC",
+                            "postalCode": "V3N 1A7",
+                            "country": "CA",
+                        }
+                    ],
+                },
+            }
+        ],
+    }
+
+    result = extract_hospital_resources(fake_bundle)
+
+    assert len(result) == 1
+    assert result[0]["resourceType"] == "Organization"
+    assert result[0]["name"] == "Primecare Medical Centre"
+    assert len(result[0]["address"]) == 1
 
 
 def test_extract_practitioner_resources_from_bundle():
@@ -53,6 +87,8 @@ def test_extract_practitioner_resources_ignores_other_resources():
 def test_extract_practitioner_resources_empty_bundle():
     fake_bundle = {"entry": []}
 
-    result = extract_practitioner_resources(fake_bundle)
+    result_practitioner = extract_practitioner_resources(fake_bundle)
+    result_hospital = extract_hospital_resources(fake_bundle)
 
-    assert result == []
+    assert result_practitioner == []
+    assert result_hospital == []

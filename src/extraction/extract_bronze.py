@@ -11,6 +11,14 @@ def extract_practitioner_resources(bundle: dict) -> list[dict]:
     ]
 
 
+def extract_hospital_resources(bundle: dict) -> list[dict]:
+    return [
+        entry["resource"]
+        for entry in bundle["entry"]
+        if entry["resource"]["resourceType"] == "Organization"
+    ]
+
+
 def extract_from_bronze(
     blob_service_client: BlobServiceClient, container_name: str, blob_name: str
 ) -> list[dict]:
