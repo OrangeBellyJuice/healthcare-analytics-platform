@@ -23,3 +23,18 @@ class Practitioner(BaseModel):
     name: list[PractitionerName]
     address: list[PractitionerAddress]
     gender: Literal["female", "male"]
+
+
+class OrganizationAddress(BaseModel):
+    line: list[str]
+    city: str
+    state: str = "BC"
+    postalCode: str
+    country: str = "CA"
+
+
+class Organization(BaseModel):
+    resourceType: str = "Organization"
+    id: str
+    name: str
+    address: Literal[Organization]

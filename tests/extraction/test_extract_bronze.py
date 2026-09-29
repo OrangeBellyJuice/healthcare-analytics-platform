@@ -1,5 +1,5 @@
 from src.extraction.extract_bronze import (
-    extract_hospital_resources,
+    extract_organization_resources,
     extract_practitioner_resources,
 )
 
@@ -27,7 +27,7 @@ def test_extract_hospital_resources_from_bundle():
         ],
     }
 
-    result = extract_hospital_resources(fake_bundle)
+    result = extract_organization_resources(fake_bundle)
 
     assert len(result) == 1
     assert result[0]["resourceType"] == "Organization"
@@ -88,7 +88,7 @@ def test_extract_practitioner_resources_empty_bundle():
     fake_bundle = {"entry": []}
 
     result_practitioner = extract_practitioner_resources(fake_bundle)
-    result_hospital = extract_hospital_resources(fake_bundle)
+    result_organization = extract_organization_resources(fake_bundle)
 
     assert result_practitioner == []
-    assert result_hospital == []
+    assert result_organization == []
