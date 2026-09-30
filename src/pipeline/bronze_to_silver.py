@@ -8,7 +8,7 @@ from src.extraction.extract_bronze import extract_from_bronze
 from src.loading.load_silver import load_to_silver
 from src.transforms.organization import transform_organizations
 from src.transforms.practitioner import transform_practitioners
-from src.validations.validators import validate_organizations, validate_practitioners
+from src.validations.validators import validation
 
 ACCOUNT_URL = "https://syntheagendata.blob.core.windows.net"
 CONTAINER_NAME = "lake"
@@ -42,7 +42,7 @@ def run_practitioner_pipeline() -> None:
         blob_service_client, CONTAINER_NAME, bronze_blob_name, "Practitioner"
     )
 
-    valid_practitioners = validate_practitioners(raw_practitioners)
+    valid_practitioners = validation(raw_practitioners)
 
     clean_practitioners = transform_practitioners(valid_practitioners)
 
@@ -68,7 +68,7 @@ def run_organization_pipeline() -> None:
         blob_service_client, CONTAINER_NAME, bronze_blob_name, "Organization"
     )
 
-    valid_organizations = validate_organizations(raw_organizations)
+    valid_organizations = validation(raw_organizations)
 
     clean_organizations = transform_organizations(valid_organizations)
 
@@ -81,4 +81,4 @@ def run_organization_pipeline() -> None:
 
 if __name__ == "__main__":
     run_practitioner_pipeline()
-    run_organization_pipeline()
+    # run_organization_pipeline()
