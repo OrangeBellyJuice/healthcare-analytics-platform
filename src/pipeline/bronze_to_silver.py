@@ -81,4 +81,4 @@ def run_organization_pipeline() -> None:
 
 if __name__ == "__main__":
     run_practitioner_pipeline()
-    # run_organization_pipeline()
+    run_organization_pipeline()

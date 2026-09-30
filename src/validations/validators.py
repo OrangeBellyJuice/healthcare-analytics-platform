@@ -2,7 +2,7 @@ import logging
 
 from pydantic import BaseModel, ValidationError
 
-from src.validations.models import Organization, Practitioner
+from src.validations.models import Organization, Patient, Practitioner
 
 logger = logging.getLogger(__name__)
 
@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 RESOURCE_MODELS = {
     "Practitioner": Practitioner,
     "Organization": Organization,
+    "Patient": Patient,
 }
 
 
@@ -25,7 +26,6 @@ def validate_resource(resource: dict, model: type[BaseModel]) -> dict | None:
 
 
 def validation(resources: list[dict]) -> list[dict]:
-    logging.info(f"{model.__name__} Validation has started")
     valid = []
     for resource in resources:
         resource_type = resource["resourceType"]
@@ -33,6 +33,5 @@ def validation(resources: list[dict]) -> list[dict]:
         validated = validate_resource(resource, model)
         if validated is not None:
             valid.append(validated)
-    logging.info(f"{model.__name__} Validation has finished")
 
     return valid
