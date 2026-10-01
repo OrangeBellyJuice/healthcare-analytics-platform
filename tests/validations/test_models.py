@@ -2,11 +2,14 @@ import pytest
 from pydantic import ValidationError
 
 from src.validations.models import (
-    Condition,
     Encounter,
+    MedicationRequest,
+    Observation,
     Organization,
+    Condition,
     Patient,
     Practitioner,
+    Procedure,
 )
 
 valid_encounter = {
@@ -185,6 +188,209 @@ valid_organization = {
     ],
 }
 
+valid_observation = {
+    "resourceType": "Observation",
+    "id": "94697183-8162-51cb-d85c-1177d6dd5301",
+    "status": "final",
+    "category": [
+        {
+            "coding": [
+                {
+                    "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                    "code": "vital-signs",
+                    "display": "Vital signs",
+                }
+            ]
+        }
+    ],
+    "code": {
+        "coding": [
+            {
+                "system": "http://loinc.org",
+                "code": "8302-2",
+                "display": "Body Height",
+            }
+        ],
+        "text": "Body Height",
+    },
+    "subject": {
+        "reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"
+    },
+    "encounter": {
+        "reference": "urn:uuid:94697183-8162-51cb-d5a1-40d07064b4e1"
+    },
+    "effectiveDateTime": "2016-10-12T16:44:44-07:00",
+    "issued": "2016-10-12T16:44:44.253-07:00",
+    "valueQuantity": {
+        "value": 56.6,
+        "unit": "cm",
+        "system": "http://unitsofmeasure.org",
+        "code": "cm",
+    },
+}
+
+
+valid_procedure = {
+    "resourceType": "Procedure",
+    "id": "94697183-8162-51cb-f2eb-3fab08e350f7",
+    "status": "completed",
+    "code": {
+        "coding": [
+            {
+                "system": "http://snomed.info/sct",
+                "code": "23426006",
+                "display": "Measurement of respiratory function (procedure)",
+            }
+        ],
+        "text": "Measurement of respiratory function (procedure)",
+    },
+    "subject": {
+        "reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"
+    },
+    "encounter": {
+        "reference": "urn:uuid:94697183-8162-51cb-10f8-1df2d9f6e882"
+    },
+    "performedPeriod": {
+        "start": "2024-04-01T10:44:44-07:00",
+        "end": "2024-04-01T11:03:43-07:00",
+    },
+    "reasonReference": [
+        {
+            "reference": "urn:uuid:94697183-8162-51cb-b39b-2b8c6b950f1b",
+            "display": "Acute bronchitis (disorder)",
+        }
+    ],
+}
+
+
+valid_medication_request = {
+    "resourceType": "MedicationRequest",
+    "id": "94697183-8162-51cb-8ffd-e654fe53c12c",
+    "status": "completed",
+    "intent": "order",
+    "medicationCodeableConcept": {
+        "coding": [
+            {
+                "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                "code": "308192",
+                "display": "Amoxicillin 500 MG Oral Tablet",
+            }
+        ],
+        "text": "Amoxicillin 500 MG Oral Tablet",
+    },
+    "subject": {
+        "reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"
+    },
+    "encounter": {
+        "reference": "urn:uuid:94697183-8162-51cb-fd4f-db0eeae721a6"
+    },
+    "authoredOn": "2017-09-02T16:44:44-07:00",
+    "requester": {
+        "reference": (
+            "Practitioner?identifier="
+            "http://hl7.org/fhir/sid/us-npi|9999997791"
+        ),
+        "display": "Dr. Marcy588 Hamill307",
+    },
+    "dosageInstruction": [
+        {
+            "sequence": 1,
+            "text": (
+                "Take at regular intervals. Complete the prescribed "
+                "course unless otherwise directed (qualifier value)"
+            ),
+            "timing": {
+                "repeat": {
+                    "frequency": 3,
+                    "period": 1.0,
+                    "periodUnit": "d",
+                }
+            },
+            "asNeededBoolean": False,
+            "doseAndRate": [
+                {
+                    "doseQuantity": {
+                        "value": 1.0,
+                    }
+                }
+            ],
+        }
+    ],
+}
+
+
+def test_valid_observation_passes_validation():
+    result = Observation.model_validate(valid_observation)
+
+    assert result.id == "94697183-8162-51cb-d85c-1177d6dd5301"
+    assert result.resourceType == "Observation"
+    assert result.status == "final"
+    assert result.code.coding[0].code == "8302-2"
+    assert result.valueQuantity.value == 56.6
+
+
+def test_valid_procedure_passes_validation():
+    result = Procedure.model_validate(valid_procedure)
+
+    assert result.id == "94697183-8162-51cb-f2eb-3fab08e350f7"
+    assert result.resourceType == "Procedure"
+    assert result.status == "completed"
+    assert result.code.coding[0].code == "23426006"
+    assert result.reasonReference[0].display == (
+        "Acute bronchitis (disorder)"
+    )
+
+
+def test_valid_medication_request_passes_validation():
+    result = MedicationRequest.model_validate(valid_medication_request)
+
+    assert result.id == "94697183-8162-51cb-8ffd-e654fe53c12c"
+    assert result.resourceType == "MedicationRequest"
+    assert result.status == "completed"
+    assert result.medicationCodeableConcept.coding[0].code == "308192"
+    assert result.dosageInstruction[0].timing.repeat.frequency == 3
+
+
+def test_observation_missing_code_fails_validation():
+    invalid_observation = valid_observation.copy()
+    invalid_observation.pop("code")
+
+    with pytest.raises(ValidationError):
+        Observation.model_validate(invalid_observation)
+
+
+def test_procedure_missing_code_fails_validation():
+    invalid_procedure = valid_procedure.copy()
+    invalid_procedure.pop("code")
+
+    with pytest.raises(ValidationError):
+        Procedure.model_validate(invalid_procedure)
+
+
+def test_medication_request_missing_medication_fails_validation():
+    invalid_medication_request = valid_medication_request.copy()
+    invalid_medication_request.pop("medicationCodeableConcept")
+
+    with pytest.raises(ValidationError):
+        MedicationRequest.model_validate(invalid_medication_request)
+
+
+def test_medication_request_without_dosage_instruction_passes_validation():
+    medication_request = valid_medication_request.copy()
+    medication_request.pop("dosageInstruction")
+
+    result = MedicationRequest.model_validate(medication_request)
+
+    assert result.dosageInstruction is None
+
+
+def test_procedure_without_reason_passes_validation():
+    procedure = valid_procedure.copy()
+    procedure.pop("reasonReference")
+
+    result = Procedure.model_validate(procedure)
+
+    assert result.reasonReference is None
 
 def test_valid_encounter_passes_validation():
     result = Encounter.model_validate(valid_encounter)

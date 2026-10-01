@@ -3,6 +3,82 @@ from typing import Literal
 
 from pydantic import Field, BaseModel
 
+
+class Quantity(BaseModel):
+    value: float
+    unit: str | None = None
+    system: str | None = None
+    code: str | None = None
+
+
+class ObservationComponent(BaseModel):
+    code: CodeableConcept
+    valueQuantity: Quantity
+
+
+class Observation(BaseModel):
+    resourceType: Literal["Observation"]
+    id: str
+    status: str
+    category: list[CodeableConcept]
+    code: CodeableConcept
+    subject: Reference
+    encounter: Reference
+    effectiveDateTime: datetime
+    issued: datetime
+    valueQuantity: Quantity | None = None
+    valueCodeableConcept: CodeableConcept | None = None
+    component: list[ObservationComponent] | None = None
+
+
+class Procedure(BaseModel):
+    resourceType: Literal["Procedure"]
+    id: str
+    status: str
+    code: CodeableConcept
+    subject: Reference
+    encounter: Reference
+    performedPeriod: Period
+    reasonCode: list[CodeableConcept] | None = None
+    reasonReference: list[Reference] | None = None
+
+
+class MedicationTimingRepeat(BaseModel):
+    frequency: int | None = None
+    period: float | None = None
+    periodUnit: str | None = None
+
+
+class MedicationTiming(BaseModel):
+    repeat: MedicationTimingRepeat
+
+
+class DoseAndRate(BaseModel):
+    doseQuantity: Quantity | None = None
+
+
+class DosageInstruction(BaseModel):
+    sequence: int | None = None
+    text: str | None = None
+    asNeededBoolean: bool | None = None
+    timing: MedicationTiming | None = None
+    doseAndRate: list[DoseAndRate] | None = None
+
+
+class MedicationRequest(BaseModel):
+    resourceType: Literal["MedicationRequest"]
+    id: str
+    status: str
+    intent: str
+    medicationCodeableConcept: CodeableConcept
+    subject: Reference
+    encounter: Reference
+    authoredOn: datetime
+    requester: Reference
+    dosageInstruction: list[DosageInstruction] | None = None
+    reasonReference: list[Reference] | None = None
+
+    
 class Coding(BaseModel):
     system: str | None = None
     code: str
