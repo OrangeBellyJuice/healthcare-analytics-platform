@@ -1,7 +1,123 @@
 import pytest
 from pydantic import ValidationError
 
-from src.validations.models import Organization, Patient, Practitioner
+from src.validations.models import (
+    Condition,
+    Encounter,
+    Organization,
+    Patient,
+    Practitioner,
+)
+
+valid_encounter = {
+    "resourceType": "Encounter",
+    "id": "c2aadfa1-256b-c450-48e9-0a5e44171a14",
+    "status": "finished",
+    "class": {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+        "code": "AMB",
+    },
+    "type": [
+        {
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "185345009",
+                    "display": "Encounter for symptom (procedure)",
+                }
+            ],
+            "text": "Encounter for symptom (procedure)",
+        }
+    ],
+    "subject": {
+        "reference": "urn:uuid:c2aadfa1-256b-c450-bcd5-442316fa4fe9",
+        "display": "Mr. Aaron697 DuBuque211",
+    },
+    "participant": [
+        {
+            "individual": {
+                "reference": (
+                    "Practitioner?identifier="
+                    "http://hl7.org/fhir/sid/us-npi|9999976399"
+                ),
+                "display": "Dr. Arlene209 Olson653",
+            }
+        }
+    ],
+    "period": {
+        "start": "1997-11-16T08:55:27-08:00",
+        "end": "1997-11-16T09:10:27-08:00",
+    },
+    "reasonCode": [
+        {
+            "coding": [
+                {
+                    "system": "http://snomed.info/sct",
+                    "code": "444814009",
+                    "display": "Viral sinusitis (disorder)",
+                }
+            ]
+        }
+    ],
+    "serviceProvider": {
+        "reference": (
+            "Organization?identifier="
+            "https://github.com/synthetichealth/synthea|"
+            "0e58807a-a5f2-3e7d-a9d6-eca59bc3df95"
+        ),
+        "display": "Shoreline Medical",
+    },
+}
+
+
+valid_condition = {
+    "resourceType": "Condition",
+    "id": "c2aadfa1-256b-c450-e2a4-42a0880217f0",
+    "clinicalStatus": {
+        "coding": [
+            {
+                "system": (
+                    "http://terminology.hl7.org/"
+                    "CodeSystem/condition-clinical"
+                ),
+                "code": "resolved",
+            }
+        ]
+    },
+    "verificationStatus": {
+        "coding": [
+            {
+                "system": (
+                    "http://terminology.hl7.org/"
+                    "CodeSystem/condition-ver-status"
+                ),
+                "code": "confirmed",
+            }
+        ]
+    },
+    "code": {
+        "coding": [
+            {
+                "system": "http://snomed.info/sct",
+                "code": "109838007",
+                "display": (
+                    "Overlapping malignant neoplasm "
+                    "of colon (disorder)"
+                ),
+            }
+        ],
+        "text": "Overlapping malignant neoplasm of colon (disorder)",
+    },
+    "subject": {
+        "reference": "urn:uuid:c2aadfa1-256b-c450-bcd5-442316fa4fe9",
+    },
+    "encounter": {
+        "reference": "urn:uuid:c2aadfa1-256b-c450-8612-54e6414afc28",
+    },
+    "onsetDateTime": "2002-06-18T00:15:36-07:00",
+    "abatementDateTime": "2004-10-23T21:02:28-07:00",
+    "recordedDate": "2002-06-18T00:15:36-07:00",
+}
 
 valid_patient = {
     "resourceType": "Patient",
@@ -70,6 +186,44 @@ valid_organization = {
 }
 
 
+def test_valid_encounter_passes_validation():
+    result = Encounter.model_validate(valid_encounter)
+
+    assert result.id == "c2aadfa1-256b-c450-48e9-0a5e44171a14"
+    assert result.resourceType == "Encounter"
+    assert result.status == "finished"
+    assert result.class_.code == "AMB"
+    assert result.subject.reference == (
+        "urn:uuid:c2aadfa1-256b-c450-bcd5-442316fa4fe9"
+    )
+    assert result.period.start.year == 1997
+
+
+def test_valid_condition_passes_validation():
+    result = Condition.model_validate(valid_condition)
+
+    assert result.id == "c2aadfa1-256b-c450-e2a4-42a0880217f0"
+    assert result.resourceType == "Condition"
+    assert result.clinicalStatus.coding[0].code == "resolved"
+    assert result.verificationStatus.coding[0].code == "confirmed"
+    assert result.code.coding[0].code == "109838007"
+
+
+def test_encounter_missing_subject_fails_validation():
+    invalid_encounter = valid_encounter.copy()
+    invalid_encounter.pop("subject")
+
+    with pytest.raises(ValidationError):
+        Encounter.model_validate(invalid_encounter)
+
+
+def test_condition_missing_code_fails_validation():
+    invalid_condition = valid_condition.copy()
+    invalid_condition.pop("code")
+
+    with pytest.raises(ValidationError):
+        Condition.model_validate(invalid_condition)
+
 def test_valid_patient_passes_validation():
     result = Patient.model_validate(valid_patient)
 
@@ -96,6 +250,22 @@ def test_valid_practitioner_passes_validation():
     assert result.name[0].family == "Schumm995"
     assert result.address[0].state == "BC"
 
+def test_encounter_without_reason_code_passes_validation():
+    encounter = valid_encounter.copy()
+    encounter.pop("reasonCode")
+
+    result = Encounter.model_validate(encounter)
+
+    assert result.reasonCode is None
+
+
+def test_condition_without_abatement_datetime_passes_validation():
+    condition = valid_condition.copy()
+    condition.pop("abatementDateTime")
+
+    result = Condition.model_validate(condition)
+
+    assert result.abatementDateTime is None  
 
 def test_patient_missing_name_fails_validation():
     invalid_patient = valid_patient.copy()
