@@ -2,15 +2,20 @@ import logging
 
 from pydantic import BaseModel, ValidationError
 
-from src.validations.models import Organization, Patient, Practitioner
+from src.validations.models import Condition, Encounter, MedicalRequest, Observation, Organization, Patient, Practitioner, Procedure
 
 logger = logging.getLogger(__name__)
 
 
 RESOURCE_MODELS = {
-    "Practitioner": Practitioner,
+    "Condition": Condition,
+    "Encounter": Encounter,
+    "MedicalRequest": MedicalRequest,
+    "Observation": Observation,
     "Organization": Organization,
     "Patient": Patient,
+    "Practitioner": Practitioner,
+    "Procedure": Procedure
 }
 
 
