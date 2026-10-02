@@ -3,7 +3,6 @@ from src.transforms.procedure import (
     transform_procedure,
 )
 
-
 procedure_with_reason_reference = {
     "resourceType": "Procedure",
     "id": "94697183-8162-51cb-f2eb-3fab08e350f7",

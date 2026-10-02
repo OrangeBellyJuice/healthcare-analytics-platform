@@ -2,11 +2,11 @@ import pytest
 from pydantic import ValidationError
 
 from src.validations.models import (
+    Condition,
     Encounter,
     MedicationRequest,
     Observation,
     Organization,
-    Condition,
     Patient,
     Practitioner,
     Procedure,

@@ -4,7 +4,6 @@ from src.transforms.observation import (
     transform_observation,
 )
 
-
 quantity_observation = {
     "resourceType": "Observation",
     "id": "94697183-8162-51cb-d85c-1177d6dd5301",

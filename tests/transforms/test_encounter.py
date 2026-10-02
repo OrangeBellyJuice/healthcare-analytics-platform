@@ -5,7 +5,6 @@ from src.transforms.encounter import (
     transform_encounter,
 )
 
-
 fake_resource = {
     "resourceType": "Encounter",
     "id": "c2aadfa1-256b-c450-48e9-0a5e44171a14",

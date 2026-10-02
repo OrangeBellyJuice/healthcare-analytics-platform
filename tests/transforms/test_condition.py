@@ -1,6 +1,5 @@
 from src.transforms.condition import transform_condition
 
-
 fake_resource = {
     "resourceType": "Condition",
     "id": "c2aadfa1-256b-c450-e2a4-42a0880217f0",

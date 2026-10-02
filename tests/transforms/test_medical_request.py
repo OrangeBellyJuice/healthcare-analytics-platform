@@ -4,7 +4,6 @@ from src.transforms.medical_request import (
     transform_medication_request,
 )
 
-
 regular_medication_request = {
     "resourceType": "MedicationRequest",
     "id": "94697183-8162-51cb-8ffd-e654fe53c12c",
