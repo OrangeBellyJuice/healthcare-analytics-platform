@@ -4,7 +4,6 @@ from io import BytesIO
 import pandas as pd
 from azure.storage.blob import BlobServiceClient
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -45,16 +44,15 @@ def load_to_silver(
 
     logger.info(f"Loading {len(records)} records to {silver_blob_name}")
 
-    df = create_dataframe(records)
+    try:
+        df = create_dataframe(records)
+        parquet_bytes = serialize_parquet(df)
 
-    logger.info(f"Created DataFrame with {len(df)} rows and {len(df.columns)} columns")
-
-    parquet_bytes = serialize_parquet(df)
-
-    logger.info(f"Serialized {silver_blob_name} to Parquet ({len(parquet_bytes)}) bytes")
-
-    write_silver_blob(
-        blob_service_client, container_name, silver_blob_name, parquet_bytes
-    )
+        write_silver_blob(
+            blob_service_client, container_name, silver_blob_name, parquet_bytes
+        )
+    except (OSError, ValueError):
+        logger.exception(f"Failed to load {silver_blob_name}")
+        raise
 
     logger.info(f"Successfully loaded {silver_blob_name} to Silver")

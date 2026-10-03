@@ -1,6 +1,7 @@
 import logging
-from json import loads
+from json import JSONDecodeError, loads
 
+from azure.core.exceptions import AzureError
 from azure.storage.blob import BlobServiceClient
 
 logger = logging.getLogger(__name__)
@@ -23,16 +24,20 @@ def extract_from_bronze(
 
     logger.info(f"Extracting {resource_type} from {blob_name}")
 
-    blob_client = blob_service_client.get_blob_client(
-        container=container_name, blob=blob_name
-    )
+    try: 
+        blob_client = blob_service_client.get_blob_client(
+            container=container_name, blob=blob_name
+        )
 
-    bundle = loads(blob_client.download_blob().readall())
+        bundle = loads(blob_client.download_blob().readall())
+    except (AzureError, JSONDecodeError):
+        logger.exception(f"Failed to extract {resource_type} resources from {blob_name}")
+        raise
 
     resources = extract_resources(bundle, resource_type)
 
     if not resources:
-        logger.warning(f"No {resource_type} resource found in {blob_name}")
+        logger.warning(f"No {resource_type} resources found in {blob_name}")
     else:
         logger.info(f"Extracted {len(resources)} {resource_type} resources")
 
