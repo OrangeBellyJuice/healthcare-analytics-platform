@@ -3,10 +3,14 @@ from collections.abc import Callable
 from functools import partial
 from pathlib import Path
 
+from azure.core.exceptions import AzureError
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 
+from src.config.logging_config import setup_logging
+
 logger = logging.getLogger(__name__)
+
 
 class UploadError(Exception):
     pass
@@ -47,17 +51,20 @@ def upload_blob_file(
     blob_service_client: BlobServiceClient, container_name: str, file_path: Path
 ) -> None:
 
-    container_client = blob_service_client.get_container_client(
-        container=container_name
-    )
-
-    with file_path.open("rb") as data:
-        container_client.upload_blob(
-            name=f"bronze/{file_path.name}", data=data, overwrite=True
+    try:
+        container_client = blob_service_client.get_container_client(
+            container=container_name
         )
 
+        with file_path.open("rb") as data:
+            container_client.upload_blob(
+                name=f"bronze/{file_path.name}", data=data, overwrite=True
+            )
+    except (AzureError, OSError) as e:
+        raise UploadError(f"Failed to upload {file_path.name} - {e}") from e
 
-if __name__ == "__main__":
+def main():
+    setup_logging("upload_bronze.log")
     folder_path = Path("~/synthea/output/fhir/").expanduser()
 
     container_name = "lake"
@@ -68,10 +75,13 @@ if __name__ == "__main__":
 
     uploader = partial(upload_blob_file, blob_service_client, container_name)
 
-    logging.basicConfig(level=logging.INFO)
     logger.info("Ingestion Started")
 
     json_files = find_json_files(folder_path)
     uploaded, failed = upload_files(json_files, uploader)
 
-    logger.info("Ingestion Finished")
+    logger.info(f"Ingestion Finished: {uploaded} uploaded and {failed} failed")
+
+
+if __name__ == "__main__":
+    main()
