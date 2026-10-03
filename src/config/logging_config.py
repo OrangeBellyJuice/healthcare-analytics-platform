@@ -14,3 +14,5 @@ def setup_logging(log_file: str) -> None:
             logging.FileHandler(log_dir / log_file),
         ],
     )
+
+    logging.getLogger("azure").setLevel(logging.WARNING)
