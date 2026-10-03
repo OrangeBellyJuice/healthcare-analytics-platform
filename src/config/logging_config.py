@@ -7,7 +7,7 @@ def setup_logging(log_file: str) -> None:
     log_dir.mkdir(exist_ok=True)
 
     logging.basicConfig(
-        levels=logging.INFO,
+        level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         handlers=[
             logging.StreamHandler(),
