@@ -8,26 +8,34 @@ from azure.storage.blob import BlobServiceClient
 
 logger = logging.getLogger(__name__)
 
+class UploadError(Exception):
+    pass
+
 
 def find_json_files(folder_path: Path) -> list[Path]:
     return list(folder_path.glob("*.json"))
 
 
-def upload_files(json_files: list[Path], uploader: Callable[[Path], None]) -> None:
+def upload_files(json_files: list[Path], uploader: Callable[[Path], None]) -> tuple[int, int]:
+
     if not json_files:
         logger.warning("No JSON files found to upload")
         return 0, 0
 
     logger.info(f"Starting the upload of {len(json_files)} files")
+
     files_uploaded, files_failed = 0, 0
 
     for index, json_file in enumerate(json_files, start=1):
         try:
             uploader(json_file)
             files_uploaded += 1
+
             logger.info(f"[{index}/{len(json_files)}] {json_file.name} uploaded")
-        except Exception as e:
+
+        except UploadError as e:
             files_failed += 1
+            
             logger.error(f"[{index}/{len(json_files)}] {json_file.name} failed - {e}")
 
     logger.info(f"Upload finished: {files_uploaded} succeeded, {files_failed} failed")

@@ -1,4 +1,9 @@
-from src.ingestion.upload_bronze import find_json_files, upload_blob_file, upload_files
+from src.ingestion.upload_bronze import (
+    UploadError,
+    find_json_files,
+    upload_blob_file,
+    upload_files,
+)
 
 
 class FakeContainerClient:
@@ -34,7 +39,7 @@ def test_upload_files_continues_when_one_file_fails(tmp_path):
         attempted_uploads.append(file_path)
 
         if file_path.name == "bob.json":
-            raise Exception("Fake upload failure")
+            raise UploadError("Fake upload failure")
 
     uploaded, failed = upload_files(json_files, fake_uploader)
 

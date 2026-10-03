@@ -4,6 +4,26 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 
+class Coding(BaseModel):
+    system: str | None = None
+    code: str
+    display: str | None = None
+
+
+class CodeableConcept(BaseModel):
+    coding: list[Coding]
+    text: str | None = None
+
+
+class Reference(BaseModel):
+    reference: str
+    display: str | None = None
+
+
+class Period(BaseModel):
+    start: datetime
+    end: datetime
+
 class Quantity(BaseModel):
     value: float
     unit: str | None = None
@@ -78,27 +98,6 @@ class MedicationRequest(BaseModel):
     dosageInstruction: list[DosageInstruction] | None = None
     reasonReference: list[Reference] | None = None
 
-    
-class Coding(BaseModel):
-    system: str | None = None
-    code: str
-    display: str | None = None
-
-
-class CodeableConcept(BaseModel):
-    coding: list[Coding]
-    text: str | None = None
-
-
-class Reference(BaseModel):
-    reference: str
-    display: str | None = None
-
-
-class Period(BaseModel):
-    start: datetime
-    end: datetime
-
 
 class Address(BaseModel):
     line: list[str]
@@ -107,23 +106,6 @@ class Address(BaseModel):
     postalCode: str
     country: str
 
-
-class PatientName(BaseModel):
-    family: str
-    given: list[str]
-    prefix: list[str]
-
-
-class Patient(BaseModel):
-    resourceType: Literal["Patient"]
-    id: str
-    name: list[PatientName]
-    gender: Literal["male", "female", "other", "unknown"]
-    birthDate: date
-    deceasedDateTime: datetime | None = None
-    address: list[Address]
-    maritalStatus: CodeableConcept
-    multipleBirthBoolean: bool
 
 
 class EncounterParticipant(BaseModel):
