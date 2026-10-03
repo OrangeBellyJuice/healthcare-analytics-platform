@@ -4,8 +4,8 @@ from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 
 from src.config.logging_config import setup_logging
-from src.extraction.extract_bronze import extract_from_bronze
-from src.loading.load_silver import load_to_silver
+from src.extraction.extract_from_bronze import extract_from_bronze
+from src.loading.load_to_silver import load_to_silver
 from src.transforms.organization import transform_organizations
 from src.transforms.practitioner import transform_practitioners
 from src.validations.validators import validation

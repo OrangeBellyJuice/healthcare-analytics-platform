@@ -1,4 +1,4 @@
-from src.extraction.extract_bronze import extract_resources
+from src.extraction.extract_from_bronze import extract_resources
 
 
 def test_extract_hospital_resources_from_bundle():
