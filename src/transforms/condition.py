@@ -1,3 +1,8 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 def extract_reference_id(reference: str) -> str:
     return reference.removeprefix("urn:uuid:")
 
@@ -37,10 +42,18 @@ def transform_condition(resource: dict) -> dict:
 
 def transform_conditions(resources: list[dict]) -> list[dict]:
 
+    logger.info(
+        f"Starting transformation of {len(resources)} Condition resources"
+    )
+
     results = []
 
     for resource in resources:
         cleaned_resource = transform_condition(resource)
         results.append(cleaned_resource)
+
+    logger.info(
+        f"Condition transformation finished: {len(results)} transformed"
+    )
 
     return results

@@ -1,3 +1,8 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 def extract_reference_id(reference: str) -> str:
     return reference.removeprefix("urn:uuid:")
 
@@ -83,10 +88,18 @@ def transform_observation(resource: dict) -> dict:
 
 def transform_observations(resources: list[dict]) -> list[dict]:
 
+    logger.info(
+        f"Starting transformation of {len(resources)} Observation resources"
+    )
+
     results = []
 
     for resource in resources:
         cleaned_resource = transform_observation(resource)
         results.append(cleaned_resource)
+
+    logger.info(
+        f"Observation transformation finished: {len(results)} transformed"
+    )
 
     return results

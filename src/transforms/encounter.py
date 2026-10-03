@@ -1,4 +1,7 @@
+import logging
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 
 def extract_reference_id(reference: str | None) -> str | None:
@@ -90,10 +93,18 @@ def transform_encounter(resource: dict) -> dict:
 
 def transform_encounters(resources: list[dict]) -> list[dict]:
 
+    logger.info(
+        f"Starting transformation of {len(resources)} Encounter resources"
+    )
+
     results = []
 
     for resource in resources:
         cleaned_resource = transform_encounter(resource)
         results.append(cleaned_resource)
+
+    logger.info(
+        f"Encounter transformation finished: {len(results)} transformed"
+    )
 
     return results

@@ -1,3 +1,8 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 from datetime import datetime
 
 
@@ -74,10 +79,18 @@ def transform_procedure(resource: dict) -> dict:
 
 def transform_procedures(resources: list[dict]) -> list[dict]:
 
+    logger.info(
+        f"Starting transformation of {len(resources)} Procedure resources"
+    )
+
     results = []
 
     for resource in resources:
         cleaned_resource = transform_procedure(resource)
         results.append(cleaned_resource)
+
+    logger.info(
+        f"Procedure transformation finished: {len(results)} transformed"
+    )
 
     return results

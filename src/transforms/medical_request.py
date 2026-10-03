@@ -1,3 +1,8 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 def extract_reference_id(reference: str | None) -> str | None:
     if reference is None:
         return None
@@ -99,10 +104,18 @@ def transform_medication_request(resource: dict) -> dict:
 
 def transform_medication_requests(resources: list[dict]) -> list[dict]:
 
+    logger.info(
+        f"Starting transformation of {len(resources)} MedicationRequest resources"
+    )
+
     results = []
 
     for resource in resources:
         cleaned_resource = transform_medication_request(resource)
         results.append(cleaned_resource)
+
+    logger.info(
+        f"MedicationRequest transformation finished: {len(results)} transformed"
+    )
 
     return results
