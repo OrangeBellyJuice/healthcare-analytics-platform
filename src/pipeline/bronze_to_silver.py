@@ -1,9 +1,9 @@
 import logging
-from pathlib import Path
 
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 
+from src.config.logging_config import setup_logging
 from src.extraction.extract_bronze import extract_from_bronze
 from src.loading.load_silver import load_to_silver
 from src.transforms.organization import transform_organizations
@@ -13,24 +13,11 @@ from src.validations.validators import validation
 ACCOUNT_URL = "https://syntheagendata.blob.core.windows.net"
 CONTAINER_NAME = "lake"
 
-
-def configure_logging() -> None:
-    log_dir = Path(__file__).resolve().parents[2] / "logs"
-    log_dir.mkdir(exist_ok=True)
-
-    log_file = log_dir / "bronze_to_silver.log"
-
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
-        handlers=[logging.StreamHandler(), logging.FileHandler(log_file)],
-    )
+logger = logging.getLogger(__name__)
 
 
 def run_practitioner_pipeline() -> None:
-    configure_logging()
 
-    logger = logging.getLogger(__name__)
     logger.info("Practitioner Bronze -> Silver pipeline has started")
 
     credential = DefaultAzureCredential()
@@ -54,9 +41,7 @@ def run_practitioner_pipeline() -> None:
 
 
 def run_organization_pipeline() -> None:
-    configure_logging()
 
-    logger = logging.getLogger(__name__)
     logger.info("Organization Bronze -> Silver pipeline has started")
 
     credential = DefaultAzureCredential()
@@ -80,5 +65,7 @@ def run_organization_pipeline() -> None:
 
 
 if __name__ == "__main__":
+    setup_logging("bronze_to_silver.log")
+
     run_practitioner_pipeline()
     run_organization_pipeline()
