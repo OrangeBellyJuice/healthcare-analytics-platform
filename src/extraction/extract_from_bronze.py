@@ -1,6 +1,9 @@
+import logging
 from json import loads
 
 from azure.storage.blob import BlobServiceClient
+
+logger = logging.getLogger(__name__)
 
 
 def extract_resources(bundle: dict, resource_type: str) -> list[dict]:
@@ -17,10 +20,20 @@ def extract_from_bronze(
     blob_name: str,
     resource_type: str,
 ) -> list[dict]:
+
+    logger.info(f"Extracting {resource_type} from {blob_name}")
+
     blob_client = blob_service_client.get_blob_client(
         container=container_name, blob=blob_name
     )
 
     bundle = loads(blob_client.download_blob().readall())
 
-    return extract_resources(bundle, resource_type)
+    resources = extract_resources(bundle, resource_type)
+
+    if not resources:
+        logger.warning(f"No {resource_type} resource found in {blob_name}")
+    else:
+        logger.info(f"Extracted {len(resources)} {resource_type} resources")
+
+    return resources
