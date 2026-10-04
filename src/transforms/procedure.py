@@ -44,12 +44,8 @@ def transform_procedure(resource: dict) -> dict:
 
     data = {
         "procedure_id": resource["id"],
-        "patient_id": extract_reference_id(
-            resource["subject"]["reference"]
-        ),
-        "encounter_id": extract_reference_id(
-            resource["encounter"]["reference"]
-        ),
+        "patient_id": extract_reference_id(resource["subject"]["reference"]),
+        "encounter_id": extract_reference_id(resource["encounter"]["reference"]),
         "status": resource["status"],
         "procedure_code": procedure.get("code"),
         "procedure": procedure.get(
@@ -68,22 +64,15 @@ def transform_procedure(resource: dict) -> dict:
             if reason_reference.get("reference")
             else None
         ),
-        "reason": (
-            reason_reference.get("display")
-            or reason_code.get("display")
-        ),
+        "reason": (reason_reference.get("display") or reason_code.get("display")),
     }
 
     return data
 
 
-
 def transform_procedures(resources: list[dict]) -> list[dict]:
 
-    logger.info(
-        f"Starting transformation of "
-        f"{len(resources)} Procedure resources"
-    )
+    logger.info(f"Starting transformation of {len(resources)} Procedure resources")
 
     results = []
 
@@ -94,15 +83,10 @@ def transform_procedures(resources: list[dict]) -> list[dict]:
 
         except (KeyError, IndexError, TypeError):
             logger.exception(
-                f"Failed to transform Procedure "
-                f"{resource.get('id', 'unknown')}"
+                f"Failed to transform Procedure {resource.get('id', 'unknown')}"
             )
             raise
 
-    logger.info(
-        f"Procedure transformation finished: "
-        f"{len(results)} transformed"
-    )
+    logger.info(f"Procedure transformation finished: {len(results)} transformed")
 
     return results
-

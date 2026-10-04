@@ -20,7 +20,9 @@ def find_json_files(folder_path: Path) -> list[Path]:
     return list(folder_path.glob("*.json"))
 
 
-def upload_files(json_files: list[Path], uploader: Callable[[Path], None]) -> tuple[int, int]:
+def upload_files(
+    json_files: list[Path], uploader: Callable[[Path], None]
+) -> tuple[int, int]:
 
     if not json_files:
         logger.warning("No JSON files found to upload")
@@ -39,7 +41,7 @@ def upload_files(json_files: list[Path], uploader: Callable[[Path], None]) -> tu
 
         except UploadError as e:
             files_failed += 1
-            
+
             logger.error(f"[{index}/{len(json_files)}] {json_file.name} failed - {e}")
 
     logger.info(f"Upload finished: {files_uploaded} succeeded, {files_failed} failed")
@@ -62,6 +64,7 @@ def upload_blob_file(
             )
     except (AzureError, OSError) as e:
         raise UploadError(f"Failed to upload {file_path.name} - {e}") from e
+
 
 def main():
     setup_logging("upload_bronze.log")

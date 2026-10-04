@@ -17,12 +17,8 @@ procedure_with_reason_reference = {
         ],
         "text": "Measurement of respiratory function (procedure)",
     },
-    "subject": {
-        "reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"
-    },
-    "encounter": {
-        "reference": "urn:uuid:94697183-8162-51cb-10f8-1df2d9f6e882"
-    },
+    "subject": {"reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"},
+    "encounter": {"reference": "urn:uuid:94697183-8162-51cb-10f8-1df2d9f6e882"},
     "performedPeriod": {
         "start": "2024-04-01T10:44:44-07:00",
         "end": "2024-04-01T11:03:43-07:00",
@@ -50,12 +46,8 @@ procedure_with_reason_code = {
         ],
         "text": "Dental consultation and report (procedure)",
     },
-    "subject": {
-        "reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"
-    },
-    "encounter": {
-        "reference": "urn:uuid:94697183-8162-51cb-4c15-6f756591ad97"
-    },
+    "subject": {"reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"},
+    "encounter": {"reference": "urn:uuid:94697183-8162-51cb-4c15-6f756591ad97"},
     "performedPeriod": {
         "start": "2023-09-06T16:44:44-07:00",
         "end": "2023-09-06T17:04:33-07:00",
@@ -87,25 +79,15 @@ def test_calculate_duration_minutes():
 def test_transform_procedure_with_reason_reference():
     results = transform_procedure(procedure_with_reason_reference)
 
-    assert results["procedure_id"] == (
-        "94697183-8162-51cb-f2eb-3fab08e350f7"
-    )
-    assert results["patient_id"] == (
-        "94697183-8162-51cb-016a-7aaefbb845ba"
-    )
-    assert results["encounter_id"] == (
-        "94697183-8162-51cb-10f8-1df2d9f6e882"
-    )
+    assert results["procedure_id"] == ("94697183-8162-51cb-f2eb-3fab08e350f7")
+    assert results["patient_id"] == ("94697183-8162-51cb-016a-7aaefbb845ba")
+    assert results["encounter_id"] == ("94697183-8162-51cb-10f8-1df2d9f6e882")
     assert results["status"] == "completed"
     assert results["procedure_code"] == "23426006"
-    assert results["procedure"] == (
-        "Measurement of respiratory function (procedure)"
-    )
+    assert results["procedure"] == ("Measurement of respiratory function (procedure)")
     assert results["duration_minutes"] == 18.98
     assert results["reason_code"] is None
-    assert results["reason_condition_id"] == (
-        "94697183-8162-51cb-b39b-2b8c6b950f1b"
-    )
+    assert results["reason_condition_id"] == ("94697183-8162-51cb-b39b-2b8c6b950f1b")
     assert results["reason"] == "Acute bronchitis (disorder)"
 
 
@@ -115,9 +97,7 @@ def test_transform_procedure_with_reason_code():
     assert results["procedure_code"] == "34043003"
     assert results["reason_code"] == "103697008"
     assert results["reason_condition_id"] is None
-    assert results["reason"] == (
-        "Patient referral for dental care (procedure)"
-    )
+    assert results["reason"] == ("Patient referral for dental care (procedure)")
 
 
 def test_transform_procedure_without_reason():

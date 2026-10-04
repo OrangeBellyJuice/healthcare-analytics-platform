@@ -24,6 +24,7 @@ class Period(BaseModel):
     start: datetime
     end: datetime
 
+
 class Quantity(BaseModel):
     value: float
     unit: str | None = None
@@ -107,7 +108,6 @@ class Address(BaseModel):
     country: str
 
 
-
 class EncounterParticipant(BaseModel):
     individual: Reference
 
@@ -139,6 +139,7 @@ class Condition(BaseModel):
     onsetDateTime: datetime
     abatementDateTime: datetime | None = None
     recordedDate: datetime
+
 
 class PatientAddress(BaseModel):
     line: list[str]

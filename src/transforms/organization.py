@@ -23,13 +23,9 @@ def transform_organization(resource: dict) -> dict:
     return data
 
 
-
 def transform_organizations(resources: list[dict]) -> list[dict]:
 
-    logger.info(
-        f"Starting transformation of "
-        f"{len(resources)} Organization resources"
-    )
+    logger.info(f"Starting transformation of {len(resources)} Organization resources")
 
     results = []
 
@@ -40,15 +36,10 @@ def transform_organizations(resources: list[dict]) -> list[dict]:
 
         except (KeyError, IndexError, TypeError):
             logger.exception(
-                f"Failed to transform Organization "
-                f"{resource.get('id', 'unknown')}"
+                f"Failed to transform Organization {resource.get('id', 'unknown')}"
             )
             raise
 
-    logger.info(
-        f"Organization transformation finished: "
-        f"{len(results)} transformed"
-    )
+    logger.info(f"Organization transformation finished: {len(results)} transformed")
 
     return results
-

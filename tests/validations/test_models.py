@@ -40,8 +40,7 @@ valid_encounter = {
         {
             "individual": {
                 "reference": (
-                    "Practitioner?identifier="
-                    "http://hl7.org/fhir/sid/us-npi|9999976399"
+                    "Practitioner?identifier=http://hl7.org/fhir/sid/us-npi|9999976399"
                 ),
                 "display": "Dr. Arlene209 Olson653",
             }
@@ -79,10 +78,7 @@ valid_condition = {
     "clinicalStatus": {
         "coding": [
             {
-                "system": (
-                    "http://terminology.hl7.org/"
-                    "CodeSystem/condition-clinical"
-                ),
+                "system": ("http://terminology.hl7.org/CodeSystem/condition-clinical"),
                 "code": "resolved",
             }
         ]
@@ -91,8 +87,7 @@ valid_condition = {
         "coding": [
             {
                 "system": (
-                    "http://terminology.hl7.org/"
-                    "CodeSystem/condition-ver-status"
+                    "http://terminology.hl7.org/CodeSystem/condition-ver-status"
                 ),
                 "code": "confirmed",
             }
@@ -103,10 +98,7 @@ valid_condition = {
             {
                 "system": "http://snomed.info/sct",
                 "code": "109838007",
-                "display": (
-                    "Overlapping malignant neoplasm "
-                    "of colon (disorder)"
-                ),
+                "display": ("Overlapping malignant neoplasm of colon (disorder)"),
             }
         ],
         "text": "Overlapping malignant neoplasm of colon (disorder)",
@@ -213,12 +205,8 @@ valid_observation = {
         ],
         "text": "Body Height",
     },
-    "subject": {
-        "reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"
-    },
-    "encounter": {
-        "reference": "urn:uuid:94697183-8162-51cb-d5a1-40d07064b4e1"
-    },
+    "subject": {"reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"},
+    "encounter": {"reference": "urn:uuid:94697183-8162-51cb-d5a1-40d07064b4e1"},
     "effectiveDateTime": "2016-10-12T16:44:44-07:00",
     "issued": "2016-10-12T16:44:44.253-07:00",
     "valueQuantity": {
@@ -244,12 +232,8 @@ valid_procedure = {
         ],
         "text": "Measurement of respiratory function (procedure)",
     },
-    "subject": {
-        "reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"
-    },
-    "encounter": {
-        "reference": "urn:uuid:94697183-8162-51cb-10f8-1df2d9f6e882"
-    },
+    "subject": {"reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"},
+    "encounter": {"reference": "urn:uuid:94697183-8162-51cb-10f8-1df2d9f6e882"},
     "performedPeriod": {
         "start": "2024-04-01T10:44:44-07:00",
         "end": "2024-04-01T11:03:43-07:00",
@@ -278,17 +262,12 @@ valid_medication_request = {
         ],
         "text": "Amoxicillin 500 MG Oral Tablet",
     },
-    "subject": {
-        "reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"
-    },
-    "encounter": {
-        "reference": "urn:uuid:94697183-8162-51cb-fd4f-db0eeae721a6"
-    },
+    "subject": {"reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"},
+    "encounter": {"reference": "urn:uuid:94697183-8162-51cb-fd4f-db0eeae721a6"},
     "authoredOn": "2017-09-02T16:44:44-07:00",
     "requester": {
         "reference": (
-            "Practitioner?identifier="
-            "http://hl7.org/fhir/sid/us-npi|9999997791"
+            "Practitioner?identifier=http://hl7.org/fhir/sid/us-npi|9999997791"
         ),
         "display": "Dr. Marcy588 Hamill307",
     },
@@ -336,9 +315,7 @@ def test_valid_procedure_passes_validation():
     assert result.resourceType == "Procedure"
     assert result.status == "completed"
     assert result.code.coding[0].code == "23426006"
-    assert result.reasonReference[0].display == (
-        "Acute bronchitis (disorder)"
-    )
+    assert result.reasonReference[0].display == ("Acute bronchitis (disorder)")
 
 
 def test_valid_medication_request_passes_validation():
@@ -392,6 +369,7 @@ def test_procedure_without_reason_passes_validation():
 
     assert result.reasonReference is None
 
+
 def test_valid_encounter_passes_validation():
     result = Encounter.model_validate(valid_encounter)
 
@@ -399,9 +377,7 @@ def test_valid_encounter_passes_validation():
     assert result.resourceType == "Encounter"
     assert result.status == "finished"
     assert result.class_.code == "AMB"
-    assert result.subject.reference == (
-        "urn:uuid:c2aadfa1-256b-c450-bcd5-442316fa4fe9"
-    )
+    assert result.subject.reference == ("urn:uuid:c2aadfa1-256b-c450-bcd5-442316fa4fe9")
     assert result.period.start.year == 1997
 
 
@@ -430,6 +406,7 @@ def test_condition_missing_code_fails_validation():
     with pytest.raises(ValidationError):
         Condition.model_validate(invalid_condition)
 
+
 def test_valid_patient_passes_validation():
     result = Patient.model_validate(valid_patient)
 
@@ -456,6 +433,7 @@ def test_valid_practitioner_passes_validation():
     assert result.name[0].family == "Schumm995"
     assert result.address[0].state == "BC"
 
+
 def test_encounter_without_reason_code_passes_validation():
     encounter = valid_encounter.copy()
     encounter.pop("reasonCode")
@@ -471,7 +449,8 @@ def test_condition_without_abatement_datetime_passes_validation():
 
     result = Condition.model_validate(condition)
 
-    assert result.abatementDateTime is None  
+    assert result.abatementDateTime is None
+
 
 def test_patient_missing_name_fails_validation():
     invalid_patient = valid_patient.copy()

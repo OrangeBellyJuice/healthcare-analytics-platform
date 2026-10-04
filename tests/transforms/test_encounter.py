@@ -33,8 +33,7 @@ fake_resource = {
         {
             "individual": {
                 "reference": (
-                    "Practitioner?identifier="
-                    "http://hl7.org/fhir/sid/us-npi|9999976399"
+                    "Practitioner?identifier=http://hl7.org/fhir/sid/us-npi|9999976399"
                 ),
                 "display": "Dr. Arlene209 Olson653",
             }
@@ -67,28 +66,19 @@ fake_resource = {
 
 
 def test_extract_reference_id_from_uuid():
-    reference = (
-        "urn:uuid:c2aadfa1-256b-c450-bcd5-442316fa4fe9"
-    )
+    reference = "urn:uuid:c2aadfa1-256b-c450-bcd5-442316fa4fe9"
 
-    assert extract_reference_id(reference) == (
-        "c2aadfa1-256b-c450-bcd5-442316fa4fe9"
-    )
+    assert extract_reference_id(reference) == ("c2aadfa1-256b-c450-bcd5-442316fa4fe9")
 
 
 def test_extract_reference_id_from_identifier():
-    reference = (
-        "Practitioner?identifier="
-        "http://hl7.org/fhir/sid/us-npi|9999976399"
-    )
+    reference = "Practitioner?identifier=http://hl7.org/fhir/sid/us-npi|9999976399"
 
     assert extract_reference_id(reference) == "9999976399"
 
 
 def test_clean_display_name():
-    assert clean_display_name(
-        "Dr. Arlene209 Olson653"
-    ) == "Dr. Arlene Olson"
+    assert clean_display_name("Dr. Arlene209 Olson653") == "Dr. Arlene Olson"
 
 
 def test_calculate_duration_minutes():
@@ -103,30 +93,18 @@ def test_calculate_duration_minutes():
 def test_transform_encounter_basic_fields():
     results = transform_encounter(fake_resource)
 
-    assert results["encounter_id"] == (
-        "c2aadfa1-256b-c450-48e9-0a5e44171a14"
-    )
-    assert results["patient_id"] == (
-        "c2aadfa1-256b-c450-bcd5-442316fa4fe9"
-    )
+    assert results["encounter_id"] == ("c2aadfa1-256b-c450-48e9-0a5e44171a14")
+    assert results["patient_id"] == ("c2aadfa1-256b-c450-bcd5-442316fa4fe9")
     assert results["status"] == "finished"
     assert results["encounter_class"] == "AMB"
     assert results["encounter_type_code"] == "185345009"
-    assert results["encounter_type"] == (
-        "Encounter for symptom (procedure)"
-    )
-    assert results["start_datetime"] == (
-        "1997-11-16T08:55:27-08:00"
-    )
-    assert results["end_datetime"] == (
-        "1997-11-16T09:10:27-08:00"
-    )
+    assert results["encounter_type"] == ("Encounter for symptom (procedure)")
+    assert results["start_datetime"] == ("1997-11-16T08:55:27-08:00")
+    assert results["end_datetime"] == ("1997-11-16T09:10:27-08:00")
     assert results["duration_minutes"] == 15.0
     assert results["practitioner_npi"] == "9999976399"
     assert results["practitioner_name"] == "Dr. Arlene Olson"
-    assert results["organization_id"] == (
-        "0e58807a-a5f2-3e7d-a9d6-eca59bc3df95"
-    )
+    assert results["organization_id"] == ("0e58807a-a5f2-3e7d-a9d6-eca59bc3df95")
     assert results["organization_name"] == "Shoreline Medical"
     assert results["reason_code"] == "444814009"
     assert results["reason"] == "Viral sinusitis (disorder)"

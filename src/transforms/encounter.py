@@ -30,10 +30,7 @@ def clean_display_name(name: str | None) -> str | None:
     if name is None:
         return None
 
-    return " ".join(
-        part.rstrip("0123456789")
-        for part in name.split()
-    )
+    return " ".join(part.rstrip("0123456789") for part in name.split())
 
 
 def calculate_duration_minutes(start: str, end: str) -> float:
@@ -61,9 +58,7 @@ def transform_encounter(resource: dict) -> dict:
 
     data = {
         "encounter_id": resource["id"],
-        "patient_id": extract_reference_id(
-            resource["subject"]["reference"]
-        ),
+        "patient_id": extract_reference_id(resource["subject"]["reference"]),
         "status": resource["status"],
         "encounter_class": resource["class"]["code"],
         "encounter_type_code": encounter_type.get("code"),
@@ -74,15 +69,9 @@ def transform_encounter(resource: dict) -> dict:
             period["start"],
             period["end"],
         ),
-        "practitioner_npi": extract_reference_id(
-            practitioner.get("reference")
-        ),
-        "practitioner_name": clean_display_name(
-            practitioner.get("display")
-        ),
-        "organization_id": extract_reference_id(
-            service_provider.get("reference")
-        ),
+        "practitioner_npi": extract_reference_id(practitioner.get("reference")),
+        "practitioner_name": clean_display_name(practitioner.get("display")),
+        "organization_id": extract_reference_id(service_provider.get("reference")),
         "organization_name": service_provider.get("display"),
         "reason_code": reason.get("code"),
         "reason": reason.get("display"),
@@ -91,13 +80,9 @@ def transform_encounter(resource: dict) -> dict:
     return data
 
 
-
 def transform_encounters(resources: list[dict]) -> list[dict]:
 
-    logger.info(
-        f"Starting transformation of "
-        f"{len(resources)} Encounter resources"
-    )
+    logger.info(f"Starting transformation of {len(resources)} Encounter resources")
 
     results = []
 
@@ -108,15 +93,10 @@ def transform_encounters(resources: list[dict]) -> list[dict]:
 
         except (KeyError, IndexError, TypeError):
             logger.exception(
-                f"Failed to transform Encounter "
-                f"{resource.get('id', 'unknown')}"
+                f"Failed to transform Encounter {resource.get('id', 'unknown')}"
             )
             raise
 
-    logger.info(
-        f"Encounter transformation finished: "
-        f"{len(results)} transformed"
-    )
+    logger.info(f"Encounter transformation finished: {len(results)} transformed")
 
     return results
-

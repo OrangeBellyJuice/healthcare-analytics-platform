@@ -40,13 +40,9 @@ def transform_patient(resource: dict) -> dict:
     return data
 
 
-
 def transform_patients(resources: list[dict]) -> list[dict]:
 
-    logger.info(
-        f"Starting transformation of "
-        f"{len(resources)} Patient resources"
-    )
+    logger.info(f"Starting transformation of {len(resources)} Patient resources")
 
     results = []
 
@@ -57,15 +53,10 @@ def transform_patients(resources: list[dict]) -> list[dict]:
 
         except (KeyError, IndexError, TypeError):
             logger.exception(
-                f"Failed to transform Patient "
-                f"{resource.get('id', 'unknown')}"
+                f"Failed to transform Patient {resource.get('id', 'unknown')}"
             )
             raise
 
-    logger.info(
-        f"Patient transformation finished: "
-        f"{len(results)} transformed"
-    )
+    logger.info(f"Patient transformation finished: {len(results)} transformed")
 
     return results
-

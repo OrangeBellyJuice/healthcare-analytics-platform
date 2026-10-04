@@ -29,12 +29,8 @@ quantity_observation = {
         ],
         "text": "Body Height",
     },
-    "subject": {
-        "reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"
-    },
-    "encounter": {
-        "reference": "urn:uuid:94697183-8162-51cb-d5a1-40d07064b4e1"
-    },
+    "subject": {"reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"},
+    "encounter": {"reference": "urn:uuid:94697183-8162-51cb-d5a1-40d07064b4e1"},
     "effectiveDateTime": "2016-10-12T16:44:44-07:00",
     "issued": "2016-10-12T16:44:44.253-07:00",
     "valueQuantity": {
@@ -71,12 +67,8 @@ coded_observation = {
         ],
         "text": "Tobacco smoking status",
     },
-    "subject": {
-        "reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"
-    },
-    "encounter": {
-        "reference": "urn:uuid:94697183-8162-51cb-d5a1-40d07064b4e1"
-    },
+    "subject": {"reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"},
+    "encounter": {"reference": "urn:uuid:94697183-8162-51cb-d5a1-40d07064b4e1"},
     "effectiveDateTime": "2016-10-12T16:44:44-07:00",
     "issued": "2016-10-12T16:44:44.253-07:00",
     "valueCodeableConcept": {
@@ -117,12 +109,8 @@ blood_pressure_observation = {
         ],
         "text": "Blood pressure panel with all children optional",
     },
-    "subject": {
-        "reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"
-    },
-    "encounter": {
-        "reference": "urn:uuid:94697183-8162-51cb-d5a1-40d07064b4e1"
-    },
+    "subject": {"reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"},
+    "encounter": {"reference": "urn:uuid:94697183-8162-51cb-d5a1-40d07064b4e1"},
     "effectiveDateTime": "2016-10-12T16:44:44-07:00",
     "issued": "2016-10-12T16:44:44.253-07:00",
     "component": [
@@ -167,23 +155,15 @@ blood_pressure_observation = {
 def test_extract_reference_id():
     reference = "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"
 
-    assert extract_reference_id(reference) == (
-        "94697183-8162-51cb-016a-7aaefbb845ba"
-    )
+    assert extract_reference_id(reference) == ("94697183-8162-51cb-016a-7aaefbb845ba")
 
 
 def test_transform_quantity_observation():
     results = transform_observation(quantity_observation)
 
-    assert results["observation_id"] == (
-        "94697183-8162-51cb-d85c-1177d6dd5301"
-    )
-    assert results["patient_id"] == (
-        "94697183-8162-51cb-016a-7aaefbb845ba"
-    )
-    assert results["encounter_id"] == (
-        "94697183-8162-51cb-d5a1-40d07064b4e1"
-    )
+    assert results["observation_id"] == ("94697183-8162-51cb-d85c-1177d6dd5301")
+    assert results["patient_id"] == ("94697183-8162-51cb-016a-7aaefbb845ba")
+    assert results["encounter_id"] == ("94697183-8162-51cb-d5a1-40d07064b4e1")
     assert results["status"] == "final"
     assert results["category_code"] == "vital-signs"
     assert results["category"] == "Vital signs"

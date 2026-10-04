@@ -24,14 +24,16 @@ def extract_from_bronze(
 
     logger.info(f"Extracting {resource_type} from {blob_name}")
 
-    try: 
+    try:
         blob_client = blob_service_client.get_blob_client(
             container=container_name, blob=blob_name
         )
 
         bundle = loads(blob_client.download_blob().readall())
     except (AzureError, JSONDecodeError):
-        logger.exception(f"Failed to extract {resource_type} resources from {blob_name}")
+        logger.exception(
+            f"Failed to extract {resource_type} resources from {blob_name}"
+        )
         raise
 
     resources = extract_resources(bundle, resource_type)

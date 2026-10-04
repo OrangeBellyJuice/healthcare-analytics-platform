@@ -19,12 +19,8 @@ def transform_condition(resource: dict) -> dict:
 
     data = {
         "condition_id": resource["id"],
-        "patient_id": extract_reference_id(
-            resource["subject"]["reference"]
-        ),
-        "encounter_id": extract_reference_id(
-            resource["encounter"]["reference"]
-        ),
+        "patient_id": extract_reference_id(resource["subject"]["reference"]),
+        "encounter_id": extract_reference_id(resource["encounter"]["reference"]),
         "clinical_status": clinical_status["code"],
         "verification_status": verification_status["code"],
         "condition_code": condition["code"],
@@ -40,13 +36,9 @@ def transform_condition(resource: dict) -> dict:
     return data
 
 
-
 def transform_conditions(resources: list[dict]) -> list[dict]:
 
-    logger.info(
-        f"Starting transformation of "
-        f"{len(resources)} Condtion resources"
-    )
+    logger.info(f"Starting transformation of {len(resources)} Condtion resources")
 
     results = []
 
@@ -57,15 +49,10 @@ def transform_conditions(resources: list[dict]) -> list[dict]:
 
         except (KeyError, IndexError, TypeError):
             logger.exception(
-                f"Failed to transform Condtion "
-                f"{resource.get('id', 'unknown')}"
+                f"Failed to transform Condtion {resource.get('id', 'unknown')}"
             )
             raise
 
-    logger.info(
-        f"Condtion transformation finished: "
-        f"{len(results)} transformed"
-    )
+    logger.info(f"Condtion transformation finished: {len(results)} transformed")
 
     return results
-

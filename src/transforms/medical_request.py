@@ -29,10 +29,7 @@ def clean_display_name(name: str | None) -> str | None:
     if name is None:
         return None
 
-    return " ".join(
-        part.rstrip("0123456789")
-        for part in name.split()
-    )
+    return " ".join(part.rstrip("0123456789") for part in name.split())
 
 
 def first_dosage_instruction(resource: dict) -> dict:
@@ -57,20 +54,12 @@ def transform_medication_request(resource: dict) -> dict:
     timing = dosage.get("timing", {}).get("repeat", {})
 
     dose_and_rate = dosage.get("doseAndRate", [])
-    dose_quantity = (
-        dose_and_rate[0].get("doseQuantity", {})
-        if dose_and_rate
-        else {}
-    )
+    dose_quantity = dose_and_rate[0].get("doseQuantity", {}) if dose_and_rate else {}
 
     data = {
         "medication_request_id": resource["id"],
-        "patient_id": extract_reference_id(
-            resource["subject"]["reference"]
-        ),
-        "encounter_id": extract_reference_id(
-            resource["encounter"]["reference"]
-        ),
+        "patient_id": extract_reference_id(resource["subject"]["reference"]),
+        "encounter_id": extract_reference_id(resource["encounter"]["reference"]),
         "status": resource["status"],
         "intent": resource["intent"],
         "medication_code": medication.get("code"),
@@ -79,12 +68,8 @@ def transform_medication_request(resource: dict) -> dict:
             resource["medicationCodeableConcept"].get("text"),
         ),
         "authored_datetime": resource["authoredOn"],
-        "practitioner_npi": extract_reference_id(
-            requester.get("reference")
-        ),
-        "practitioner_name": clean_display_name(
-            requester.get("display")
-        ),
+        "practitioner_npi": extract_reference_id(requester.get("reference")),
+        "practitioner_name": clean_display_name(requester.get("display")),
         "reason_condition_id": (
             extract_reference_id(reason_reference["reference"])
             if reason_reference.get("reference")
@@ -102,12 +87,10 @@ def transform_medication_request(resource: dict) -> dict:
     return data
 
 
-
 def transform_medication_requests(resources: list[dict]) -> list[dict]:
 
     logger.info(
-        f"Starting transformation of "
-        f"{len(resources)} MedicationRequest resources"
+        f"Starting transformation of {len(resources)} MedicationRequest resources"
     )
 
     results = []
@@ -119,15 +102,12 @@ def transform_medication_requests(resources: list[dict]) -> list[dict]:
 
         except (KeyError, IndexError, TypeError):
             logger.exception(
-                f"Failed to transform MedicationRequest "
-                f"{resource.get('id', 'unknown')}"
+                f"Failed to transform MedicationRequest {resource.get('id', 'unknown')}"
             )
             raise
 
     logger.info(
-        f"MedicationRequest transformation finished: "
-        f"{len(results)} transformed"
+        f"MedicationRequest transformation finished: {len(results)} transformed"
     )
 
     return results
-

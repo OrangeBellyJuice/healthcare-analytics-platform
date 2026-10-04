@@ -55,12 +55,8 @@ def transform_observation(resource: dict) -> dict:
 
     data = {
         "observation_id": resource["id"],
-        "patient_id": extract_reference_id(
-            resource["subject"]["reference"]
-        ),
-        "encounter_id": extract_reference_id(
-            resource["encounter"]["reference"]
-        ),
+        "patient_id": extract_reference_id(resource["subject"]["reference"]),
+        "encounter_id": extract_reference_id(resource["encounter"]["reference"]),
         "status": resource["status"],
         "category_code": category.get("code"),
         "category": category.get("display"),
@@ -86,13 +82,9 @@ def transform_observation(resource: dict) -> dict:
     return data
 
 
-
 def transform_observations(resources: list[dict]) -> list[dict]:
 
-    logger.info(
-        f"Starting transformation of "
-        f"{len(resources)} Observation resources"
-    )
+    logger.info(f"Starting transformation of {len(resources)} Observation resources")
 
     results = []
 
@@ -103,15 +95,10 @@ def transform_observations(resources: list[dict]) -> list[dict]:
 
         except (KeyError, IndexError, TypeError):
             logger.exception(
-                f"Failed to transform Observation "
-                f"{resource.get('id', 'unknown')}"
+                f"Failed to transform Observation {resource.get('id', 'unknown')}"
             )
             raise
 
-    logger.info(
-        f"Observation transformation finished: "
-        f"{len(results)} transformed"
-    )
+    logger.info(f"Observation transformation finished: {len(results)} transformed")
 
     return results
-

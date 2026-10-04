@@ -48,9 +48,7 @@ def validation(resources: list[dict]) -> list[dict]:
 
     resource_type = resources[0]["resourceType"]
 
-    logger.info(
-        f"Starting validation of {len(resources)} {resource_type} resources" 
-    )
+    logger.info(f"Starting validation of {len(resources)} {resource_type} resources")
 
     for resource in resources:
         model = RESOURCE_MODELS[resource["resourceType"]]
@@ -60,6 +58,8 @@ def validation(resources: list[dict]) -> list[dict]:
 
     failed = len(resources) - len(valid)
 
-    logger.info(f"{resource_type} validation finished: {len(valid)} passed, {failed} failed")
+    logger.info(
+        f"{resource_type} validation finished: {len(valid)} passed, {failed} failed"
+    )
 
     return valid
