@@ -86,20 +86,32 @@ def transform_observation(resource: dict) -> dict:
     return data
 
 
+
 def transform_observations(resources: list[dict]) -> list[dict]:
 
     logger.info(
-        f"Starting transformation of {len(resources)} Observation resources"
+        f"Starting transformation of "
+        f"{len(resources)} Observation resources"
     )
 
     results = []
 
     for resource in resources:
-        cleaned_resource = transform_observation(resource)
-        results.append(cleaned_resource)
+        try:
+            cleaned_resource = transform_observation(resource)
+            results.append(cleaned_resource)
+
+        except (KeyError, IndexError, TypeError):
+            logger.exception(
+                f"Failed to transform Observation "
+                f"{resource.get('id', 'unknown')}"
+            )
+            raise
 
     logger.info(
-        f"Observation transformation finished: {len(results)} transformed"
+        f"Observation transformation finished: "
+        f"{len(results)} transformed"
     )
 
     return results
+

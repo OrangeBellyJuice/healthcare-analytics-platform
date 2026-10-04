@@ -91,20 +91,32 @@ def transform_encounter(resource: dict) -> dict:
     return data
 
 
+
 def transform_encounters(resources: list[dict]) -> list[dict]:
 
     logger.info(
-        f"Starting transformation of {len(resources)} Encounter resources"
+        f"Starting transformation of "
+        f"{len(resources)} Encounter resources"
     )
 
     results = []
 
     for resource in resources:
-        cleaned_resource = transform_encounter(resource)
-        results.append(cleaned_resource)
+        try:
+            cleaned_resource = transform_encounter(resource)
+            results.append(cleaned_resource)
+
+        except (KeyError, IndexError, TypeError):
+            logger.exception(
+                f"Failed to transform Encounter "
+                f"{resource.get('id', 'unknown')}"
+            )
+            raise
 
     logger.info(
-        f"Encounter transformation finished: {len(results)} transformed"
+        f"Encounter transformation finished: "
+        f"{len(results)} transformed"
     )
 
     return results
+

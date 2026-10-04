@@ -40,20 +40,32 @@ def transform_condition(resource: dict) -> dict:
     return data
 
 
+
 def transform_conditions(resources: list[dict]) -> list[dict]:
 
     logger.info(
-        f"Starting transformation of {len(resources)} Condition resources"
+        f"Starting transformation of "
+        f"{len(resources)} Condtion resources"
     )
 
     results = []
 
     for resource in resources:
-        cleaned_resource = transform_condition(resource)
-        results.append(cleaned_resource)
+        try:
+            cleaned_resource = transform_condition(resource)
+            results.append(cleaned_resource)
+
+        except (KeyError, IndexError, TypeError):
+            logger.exception(
+                f"Failed to transform Condtion "
+                f"{resource.get('id', 'unknown')}"
+            )
+            raise
 
     logger.info(
-        f"Condition transformation finished: {len(results)} transformed"
+        f"Condtion transformation finished: "
+        f"{len(results)} transformed"
     )
 
     return results
+

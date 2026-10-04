@@ -40,20 +40,32 @@ def transform_patient(resource: dict) -> dict:
     return data
 
 
+
 def transform_patients(resources: list[dict]) -> list[dict]:
 
     logger.info(
-        f"Starting transformation of {len(resources)} Patient resources"
+        f"Starting transformation of "
+        f"{len(resources)} Patient resources"
     )
 
     results = []
 
     for resource in resources:
-        cleaned_resource = transform_patient(resource)
-        results.append(cleaned_resource)
+        try:
+            cleaned_resource = transform_patient(resource)
+            results.append(cleaned_resource)
+
+        except (KeyError, IndexError, TypeError):
+            logger.exception(
+                f"Failed to transform Patient "
+                f"{resource.get('id', 'unknown')}"
+            )
+            raise
 
     logger.info(
-        f"Patient transformation finished: {len(results)} transformed"
+        f"Patient transformation finished: "
+        f"{len(results)} transformed"
     )
 
     return results
+

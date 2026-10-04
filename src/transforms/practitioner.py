@@ -38,17 +38,27 @@ def transform_practitioner(resource: dict) -> dict:
 def transform_practitioners(resources: list[dict]) -> list[dict]:
 
     logger.info(
-        f"Starting transformation of {len(resources)} Practitioner resources"
+        f"Starting transformation of "
+        f"{len(resources)} Practitioner resources"
     )
 
     results = []
 
     for resource in resources:
-        cleaned_resource = transform_practitioner(resource)
-        results.append(cleaned_resource)
+        try:
+            cleaned_resource = transform_practitioner(resource)
+            results.append(cleaned_resource)
+
+        except (KeyError, IndexError, TypeError):
+            logger.exception(
+                f"Failed to transform Practitioner "
+                f"{resource.get('id', 'unknown')}"
+            )
+            raise
 
     logger.info(
-        f"Practitioner transformation finished: {len(results)} transformed"
+        f"Practitioner transformation finished: "
+        f"{len(results)} transformed"
     )
 
     return results

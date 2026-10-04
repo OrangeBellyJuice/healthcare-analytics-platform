@@ -102,20 +102,32 @@ def transform_medication_request(resource: dict) -> dict:
     return data
 
 
+
 def transform_medication_requests(resources: list[dict]) -> list[dict]:
 
     logger.info(
-        f"Starting transformation of {len(resources)} MedicationRequest resources"
+        f"Starting transformation of "
+        f"{len(resources)} MedicationRequest resources"
     )
 
     results = []
 
     for resource in resources:
-        cleaned_resource = transform_medication_request(resource)
-        results.append(cleaned_resource)
+        try:
+            cleaned_resource = transform_medication_request(resource)
+            results.append(cleaned_resource)
+
+        except (KeyError, IndexError, TypeError):
+            logger.exception(
+                f"Failed to transform MedicationRequest "
+                f"{resource.get('id', 'unknown')}"
+            )
+            raise
 
     logger.info(
-        f"MedicationRequest transformation finished: {len(results)} transformed"
+        f"MedicationRequest transformation finished: "
+        f"{len(results)} transformed"
     )
 
     return results
+

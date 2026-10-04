@@ -77,20 +77,32 @@ def transform_procedure(resource: dict) -> dict:
     return data
 
 
+
 def transform_procedures(resources: list[dict]) -> list[dict]:
 
     logger.info(
-        f"Starting transformation of {len(resources)} Procedure resources"
+        f"Starting transformation of "
+        f"{len(resources)} Procedure resources"
     )
 
     results = []
 
     for resource in resources:
-        cleaned_resource = transform_procedure(resource)
-        results.append(cleaned_resource)
+        try:
+            cleaned_resource = transform_procedure(resource)
+            results.append(cleaned_resource)
+
+        except (KeyError, IndexError, TypeError):
+            logger.exception(
+                f"Failed to transform Procedure "
+                f"{resource.get('id', 'unknown')}"
+            )
+            raise
 
     logger.info(
-        f"Procedure transformation finished: {len(results)} transformed"
+        f"Procedure transformation finished: "
+        f"{len(results)} transformed"
     )
 
     return results
+
