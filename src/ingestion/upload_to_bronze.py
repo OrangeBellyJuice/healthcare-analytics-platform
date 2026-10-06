@@ -68,7 +68,7 @@ def upload_blob_file(
 
 def main():
     setup_logging("upload_bronze.log")
-    folder_path = Path("~/synthea/output/fhir/").expanduser()
+    folder_path = Path("~/synthea/output/test_fhir/").expanduser()
 
     container_name = "lake"
     account_url = "https://syntheagendata.blob.core.windows.net"
