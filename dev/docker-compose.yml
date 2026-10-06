@@ -11,6 +11,7 @@ services:
 
     volumes:
       - ..:/app
+      - ~/synthea/output/test_fhir:/data/test_fhir
 
     working_dir: /app
 
