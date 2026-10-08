@@ -15,7 +15,9 @@ def transform_patient(resource: dict) -> dict:
 
     last_name = remove_digits_end(resource["name"][0]["family"])
     first_name = remove_digits_end(resource["name"][0]["given"][0])
-    prefix = resource["name"][0]["prefix"][0]
+    prefix = (
+        resource["name"][0]["prefix"][0] if resource["name"][0].get("prefix") else None
+    )
     address = resource["address"][0]
     data = {
         "patient_id": resource["id"],
@@ -23,7 +25,11 @@ def transform_patient(resource: dict) -> dict:
         "first_name": first_name,
         "prefix": prefix,
         "full_name": first_name + " " + last_name,
-        "full_title": prefix + " " + first_name + " " + last_name,
+        "full_title": (
+            f"{prefix} {first_name} {last_name}"
+            if prefix
+            else f"{first_name} {last_name}"
+        ),
         "gender": resource["gender"],
         "birth_date": resource["birthDate"],
         "deceased_datetime": resource.get("deceasedDateTime"),
@@ -34,15 +40,13 @@ def transform_patient(resource: dict) -> dict:
         "postal_code": address["postalCode"],
         "country": address["country"],
         "marital_status": resource["maritalStatus"]["text"],
-        "multiple_birth": resource["multipleBirthBoolean"],
+        "multiple_birth": resource.get("multipleBirthBoolean"),
     }
 
     return data
 
 
 def transform_patients(resources: list[dict]) -> list[dict]:
-
-    logger.info(f"Starting transformation of {len(resources)} Patient resources")
 
     results = []
 
@@ -56,7 +60,5 @@ def transform_patients(resources: list[dict]) -> list[dict]:
                 f"Failed to transform Patient {resource.get('id', 'unknown')}"
             )
             raise
-
-    logger.info(f"Patient transformation finished: {len(results)} transformed")
 
     return results

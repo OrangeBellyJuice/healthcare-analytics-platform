@@ -152,7 +152,7 @@ class PatientAddress(BaseModel):
 class PatientName(BaseModel):
     family: str
     given: list[str]
-    prefix: list[str]
+    prefix: list[str] | None = None
 
 
 class PatientMaritalStatus(BaseModel):
@@ -168,7 +168,7 @@ class Patient(BaseModel):
     deceasedDateTime: datetime | None = None
     address: list[PatientAddress]
     maritalStatus: PatientMaritalStatus
-    multipleBirthBoolean: bool
+    multipleBirthBoolean: bool | None = None
 
 
 class PractitionerName(BaseModel):

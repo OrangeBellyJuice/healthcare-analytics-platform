@@ -82,8 +82,6 @@ def transform_encounter(resource: dict) -> dict:
 
 def transform_encounters(resources: list[dict]) -> list[dict]:
 
-    logger.info(f"Starting transformation of {len(resources)} Encounter resources")
-
     results = []
 
     for resource in resources:
@@ -96,7 +94,5 @@ def transform_encounters(resources: list[dict]) -> list[dict]:
                 f"Failed to transform Encounter {resource.get('id', 'unknown')}"
             )
             raise
-
-    logger.info(f"Encounter transformation finished: {len(results)} transformed")
 
     return results

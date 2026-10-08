@@ -43,23 +43,12 @@ def validation(resources: list[dict]) -> list[dict]:
     valid = []
 
     if not resources:
-        logger.warning("No resources provided for validation")
         return valid
-
-    resource_type = resources[0]["resourceType"]
-
-    logger.info(f"Starting validation of {len(resources)} {resource_type} resources")
 
     for resource in resources:
         model = RESOURCE_MODELS[resource["resourceType"]]
         validated = validate_resource(resource, model)
         if validated is not None:
             valid.append(validated)
-
-    failed = len(resources) - len(valid)
-
-    logger.info(
-        f"{resource_type} validation finished: {len(valid)} passed, {failed} failed"
-    )
 
     return valid
