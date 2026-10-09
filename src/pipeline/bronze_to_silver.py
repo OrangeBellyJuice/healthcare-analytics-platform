@@ -3,7 +3,7 @@ from collections.abc import Callable
 
 from azure.core.exceptions import AzureError
 from azure.identity import DefaultAzureCredential
-from azure.storage.blob import BlobServiceClient
+from azure.storage.blob import BlobServiceClient, ContainerClient
 
 from src.config.logging_config import setup_logging
 from src.extraction.extract_from_bronze import (
@@ -17,13 +17,45 @@ from src.loading.load_to_silver import load_to_silver
 from src.transforms.condition import transform_conditions
 from src.transforms.encounter import transform_encounters
 from src.transforms.medication_request import transform_medication_requests
+from src.transforms.organization import transform_organizations
 from src.transforms.patient import transform_patients
+from src.transforms.practitioner import transform_practitioners
 from src.transforms.procedure import transform_procedures
 from src.validations.validators import validation
 
 logger = logging.getLogger(__name__)
 
 BATCH_SIZE = 500
+
+
+def process_organizations(container_client: ContainerClient, organization_blob: str):
+    organization_bundle = extract_bundle(container_client, organization_blob)
+    raw_organizations = extract_resources(organization_bundle, "Organization")
+    valid_organizations = validation(raw_organizations)
+    clean_organizations = transform_organizations(valid_organizations)
+    return clean_organizations
+
+
+def process_practitioners(container_client: ContainerClient, practitioner_blob: str):
+    practitioner_bundle = extract_bundle(container_client, practitioner_blob)
+    raw_practitioners = extract_resources(practitioner_bundle, "Practitioner")
+    valid_practitioners = validation(raw_practitioners)
+    clean_practitioners = transform_practitioners(valid_practitioners)
+    return clean_practitioners
+
+
+def process_resources(
+    bundle: dict, resource_type: str, transform_func: Callable[[list[dict]], list[dict]]
+) -> tuple[list[dict], int, int]:
+    resources = extract_resources(bundle, resource_type)
+    valid_resources = validation(resources)
+
+    valid_count = len(valid_resources)
+    failed_count = len(resources) - valid_count
+
+    cleaned_resources = transform_func(valid_resources)
+
+    return cleaned_resources, valid_count, failed_count
 
 
 def log_and_load_batch(
@@ -48,20 +80,6 @@ def log_and_load_batch(
     )
 
     logger.info(f"Loaded {len(records)} {resource_name} records")
-
-
-def process_resources(
-    bundle: dict, resource_type: str, transform_func: Callable[[list[dict]], list[dict]]
-) -> tuple[list[dict], int, int]:
-    resources = extract_resources(bundle, resource_type)
-    valid_resources = validation(resources)
-
-    valid_count = len(valid_resources)
-    failed_count = len(resources) - valid_count
-
-    cleaned_resources = transform_func(valid_resources)
-
-    return cleaned_resources, valid_count, failed_count
 
 
 def main():
@@ -91,8 +109,21 @@ def main():
 
     logger.info("Bronze to Silver ETL Started")
 
-    # process_organizations(organization_blob)
-    # process_practitioners(practitioner_blob)
+    # process organizations - 1 file
+    load_to_silver(
+        blob_service_client,
+        container_name,
+        "silver/organizations.parquet",
+        process_organizations(container_client, organization_blob),
+    )
+
+    # process_practitioners - 1 file
+    load_to_silver(
+        blob_service_client,
+        container_name,
+        "silver/practitioners.parquet",
+        process_practitioners(container_client, practitioner_blob),
+    )
 
     for batch_number, start in enumerate(
         range(0, len(all_patient_blob_names), BATCH_SIZE), start=1
