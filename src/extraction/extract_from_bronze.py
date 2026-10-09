@@ -1,3 +1,4 @@
+import re
 import logging
 from json import JSONDecodeError, loads
 
@@ -10,15 +11,11 @@ logger = logging.getLogger(__name__)
 # write tests for this function
 def extract_patient_blob_names(container_client: ContainerClient) -> list[str]:
     blob_names = container_client.list_blob_names(name_starts_with="bronze/")
+    pattern = r"bronze\/(?!hospital|practitioner).*$"
     return sorted(
         blob_name
         for blob_name in blob_names
-        if not blob_name.startswith(
-            (
-                "bronze/hospitalInformation1790018762251",
-                "bronze/practitionerInformation1790018762251",
-            )
-        )
+        if not re.match(pattern, blob_name) 
     )
 
 
