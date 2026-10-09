@@ -16,7 +16,6 @@ def extract_patient_blob_names(container_client: ContainerClient) -> list[str]:
     )
 
 
-# write test for this functiou
 def extract_bundle(container_client: ContainerClient, blob_name: str) -> dict:
     blob_client = container_client.get_blob_client(blob_name)
     blob_bytes = blob_client.download_blob().readall()

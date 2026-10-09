@@ -1,18 +1,48 @@
 from src.extraction.extract_from_bronze import (
+    extract_bundle,
     extract_patient_blob_names,
     extract_resources,
 )
 
 
+class FakeDownload:
+    def readall(self):
+        return b'{"resourceType": "Bundle", "entry": []}'
+
+
+class FakeBlobClient:
+    def download_blob(self):
+        return FakeDownload()
+
+
 class FakeClientContainer:
     def __init__(self):
         self.uploads = []
+        self.requested_blob = None
 
     def upload_blob(self, blob_name):
         self.uploads.append(blob_name)
 
     def list_blob_names(self, name_starts_with: None):
         return self.uploads
+
+    def get_blob_client(self, blob_name):
+        self.requested_blob = blob_name
+        return FakeBlobClient()
+
+
+def test_extract_bundle():
+    fake_container_client = FakeClientContainer()
+
+    result = extract_bundle(
+        fake_container_client, "bronze/James234_Midtdal354_2342342-5232_43245.json"
+    )
+
+    assert (
+        fake_container_client.requested_blob
+        == "bronze/James234_Midtdal354_2342342-5232_43245.json"
+    )
+    assert result == {"resourceType": "Bundle", "entry": []}
 
 
 def test_extract_patient_blob_names_ignore_hospital_and_practitioner():
