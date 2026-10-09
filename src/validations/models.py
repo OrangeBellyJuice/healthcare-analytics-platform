@@ -54,18 +54,6 @@ class Observation(BaseModel):
     component: list[ObservationComponent] | None = None
 
 
-class Procedure(BaseModel):
-    resourceType: Literal["Procedure"]
-    id: str
-    status: str
-    code: CodeableConcept
-    subject: Reference
-    encounter: Reference
-    performedPeriod: Period
-    reasonCode: list[CodeableConcept] | None = None
-    reasonReference: list[Reference] | None = None
-
-
 class MedicationTimingRepeat(BaseModel):
     frequency: int | None = None
     period: float | None = None
@@ -102,14 +90,31 @@ class MedicationRequest(BaseModel):
     reasonReference: list[Reference] | None = None
 
 
-class Address(BaseModel):
-    line: list[str]
-    city: str
-    state: str
-    postalCode: str
-    country: str
+class Procedure(BaseModel):
+    resourceType: Literal["Procedure"]
+    id: str
+    status: str
+    code: CodeableConcept
+    subject: Reference
+    encounter: Reference
+    performedPeriod: Period
+    reasonCode: list[CodeableConcept] | None = None
+    reasonReference: list[Reference] | None = None
 
 
+class Condition(BaseModel):
+    resourceType: Literal["Condition"]
+    id: str
+    clinicalStatus: CodeableConcept
+    verificationStatus: CodeableConcept
+    code: CodeableConcept
+    subject: Reference
+    encounter: Reference
+    onsetDateTime: datetime
+    abatementDateTime: datetime | None = None
+    recordedDate: datetime
+
+# INTSERT OBSERVATIONS HERE
 class EncounterParticipant(BaseModel):
     individual: Reference
 
@@ -127,20 +132,7 @@ class Encounter(BaseModel):
     serviceProvider: Reference
 
 
-class Condition(BaseModel):
-    resourceType: Literal["Condition"]
-    id: str
-    clinicalStatus: CodeableConcept
-    verificationStatus: CodeableConcept
-    code: CodeableConcept
-    subject: Reference
-    encounter: Reference
-    onsetDateTime: datetime
-    abatementDateTime: datetime | None = None
-    recordedDate: datetime
-
-
-class PatientAddress(BaseModel):
+class Address(BaseModel):
     line: list[str]
     city: str
     state: str = "BC"
@@ -165,7 +157,7 @@ class Patient(BaseModel):
     gender: Literal["male", "female"]
     birthDate: date
     deceasedDateTime: datetime | None = None
-    address: list[PatientAddress]
+    address: list[Address]
     maritalStatus: PatientMaritalStatus
     multipleBirthBoolean: bool | None = None
 
@@ -176,32 +168,16 @@ class PractitionerName(BaseModel):
     prefix: list[str]
 
 
-class PractitionerAddress(BaseModel):
-    line: list[str]
-    city: str
-    state: str = "BC"
-    postalCode: str
-    country: str = "CA"
-
-
 class Practitioner(BaseModel):
     resourceType: str = "Practitioner"
     id: str
     name: list[PractitionerName]
-    address: list[PractitionerAddress]
+    address: list[Address]
     gender: Literal["female", "male"]
-
-
-class OrganizationAddress(BaseModel):
-    line: list[str]
-    city: str
-    state: str = "BC"
-    postalCode: str
-    country: str = "CA"
 
 
 class Organization(BaseModel):
     resourceType: str = "Organization"
     id: str
     name: str
-    address: list[OrganizationAddress]
+    address: list[Address]

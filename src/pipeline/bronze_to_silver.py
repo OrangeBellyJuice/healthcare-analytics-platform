@@ -102,12 +102,11 @@ def main():
         logger.exception("Failed to retrieve patient blobs from Bronze")
         raise
 
-    logger.info(f"Found {len(all_patient_blob_names)} patient bundles in Bronze")
-
     organization_blob = "bronze/hospitalInformation1790018762251.json"
     practitioner_blob = "bronze/practitionerInformation1790018762251.json"
 
     logger.info("Bronze to Silver ETL Started")
+    logger.info(f"Found {len(all_patient_blob_names)} patient bundles in Bronze")
 
     # process organizations - 1 file
     load_to_silver(
@@ -117,7 +116,7 @@ def main():
         process_organizations(container_client, organization_blob),
     )
 
-    # process_practitioners - 1 file
+    # process practitioners - 1 file
     load_to_silver(
         blob_service_client,
         container_name,
@@ -169,8 +168,8 @@ def main():
             #     transform_observations
             # )
             # batch_observations.extend(observations)
-            # condition_passed += passed
-            # condition_failed += failed
+            # observation_passed += passed
+            # observation_failed += failed
 
             conditions, passed, failed = process_resources(
                 bundle, "Condition", transform_conditions
