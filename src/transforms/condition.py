@@ -38,8 +38,6 @@ def transform_condition(resource: dict) -> dict:
 
 def transform_conditions(resources: list[dict]) -> list[dict]:
 
-    logger.info(f"Starting transformation of {len(resources)} Condtion resources")
-
     results = []
 
     for resource in resources:
@@ -52,7 +50,5 @@ def transform_conditions(resources: list[dict]) -> list[dict]:
                 f"Failed to transform Condtion {resource.get('id', 'unknown')}"
             )
             raise
-
-    logger.info(f"Condtion transformation finished: {len(results)} transformed")
 
     return results

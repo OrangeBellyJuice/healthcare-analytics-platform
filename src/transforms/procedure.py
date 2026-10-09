@@ -72,8 +72,6 @@ def transform_procedure(resource: dict) -> dict:
 
 def transform_procedures(resources: list[dict]) -> list[dict]:
 
-    logger.info(f"Starting transformation of {len(resources)} Procedure resources")
-
     results = []
 
     for resource in resources:
@@ -86,7 +84,5 @@ def transform_procedures(resources: list[dict]) -> list[dict]:
                 f"Failed to transform Procedure {resource.get('id', 'unknown')}"
             )
             raise
-
-    logger.info(f"Procedure transformation finished: {len(results)} transformed")
 
     return results

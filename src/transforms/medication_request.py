@@ -89,10 +89,6 @@ def transform_medication_request(resource: dict) -> dict:
 
 def transform_medication_requests(resources: list[dict]) -> list[dict]:
 
-    logger.info(
-        f"Starting transformation of {len(resources)} MedicationRequest resources"
-    )
-
     results = []
 
     for resource in resources:
@@ -105,9 +101,5 @@ def transform_medication_requests(resources: list[dict]) -> list[dict]:
                 f"Failed to transform MedicationRequest {resource.get('id', 'unknown')}"
             )
             raise
-
-    logger.info(
-        f"MedicationRequest transformation finished: {len(results)} transformed"
-    )
 
     return results

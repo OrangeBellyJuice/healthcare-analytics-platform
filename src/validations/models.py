@@ -34,7 +34,9 @@ class Quantity(BaseModel):
 
 class ObservationComponent(BaseModel):
     code: CodeableConcept
-    valueQuantity: Quantity
+    valueQuantity: Quantity | None = None
+    valueCodeableConcept: CodeableConcept | None = None
+    valueString: str | None = None
 
 
 class Observation(BaseModel):
@@ -128,14 +130,11 @@ class Encounter(BaseModel):
 class Condition(BaseModel):
     resourceType: Literal["Condition"]
     id: str
-
     clinicalStatus: CodeableConcept
     verificationStatus: CodeableConcept
     code: CodeableConcept
-
     subject: Reference
     encounter: Reference
-
     onsetDateTime: datetime
     abatementDateTime: datetime | None = None
     recordedDate: datetime

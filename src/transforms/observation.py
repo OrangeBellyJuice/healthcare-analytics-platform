@@ -84,8 +84,6 @@ def transform_observation(resource: dict) -> dict:
 
 def transform_observations(resources: list[dict]) -> list[dict]:
 
-    logger.info(f"Starting transformation of {len(resources)} Observation resources")
-
     results = []
 
     for resource in resources:
@@ -98,7 +96,5 @@ def transform_observations(resources: list[dict]) -> list[dict]:
                 f"Failed to transform Observation {resource.get('id', 'unknown')}"
             )
             raise
-
-    logger.info(f"Observation transformation finished: {len(results)} transformed")
 
     return results
