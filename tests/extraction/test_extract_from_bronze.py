@@ -1,4 +1,41 @@
-from src.extraction.extract_from_bronze import extract_resources
+from src.extraction.extract_from_bronze import (
+    extract_patient_blob_names,
+    extract_resources,
+)
+
+
+class FakeClientContainer:
+    def __init__(self):
+        self.uploads = []
+
+    def upload_blob(self, blob_name):
+        self.uploads.append(blob_name)
+
+    def list_blob_names(self, name_starts_with: None):
+        return self.uploads
+
+
+def test_extract_patient_blob_names_ignore_hospital_and_practitioner():
+    fake_container_client = FakeClientContainer()
+
+    fake_container_client.upload_blob("bronze/hospitalInformation4636332.json")
+    fake_container_client.upload_blob("bronze/practitionerInformation59352234.json")
+
+    results = extract_patient_blob_names(fake_container_client)
+
+    assert results == []
+
+
+def test_extract_patient_blob_names_only_practitioner():
+    fake_container_client = FakeClientContainer()
+
+    fake_container_client.upload_blob(
+        "bronze/Brandon345_Hay545_1325323_2322f32f_23f23f2f.json"
+    )
+
+    results = extract_patient_blob_names(fake_container_client)
+
+    assert results == ["bronze/Brandon345_Hay545_1325323_2322f32f_23f23f2f.json"]
 
 
 def test_extract_hospital_resources_from_bundle():

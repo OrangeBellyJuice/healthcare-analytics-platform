@@ -1,5 +1,5 @@
-import re
 import logging
+import re
 from json import JSONDecodeError, loads
 
 from azure.core.exceptions import AzureError
@@ -8,14 +8,11 @@ from azure.storage.blob import BlobServiceClient, ContainerClient
 logger = logging.getLogger(__name__)
 
 
-# write tests for this function
 def extract_patient_blob_names(container_client: ContainerClient) -> list[str]:
     blob_names = container_client.list_blob_names(name_starts_with="bronze/")
     pattern = r"bronze\/(?!hospital|practitioner).*$"
     return sorted(
-        blob_name
-        for blob_name in blob_names
-        if not re.match(pattern, blob_name) 
+        blob_name for blob_name in blob_names if bool(re.match(pattern, blob_name))
     )
 
 
