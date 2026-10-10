@@ -37,8 +37,6 @@ def transform_practitioner(resource: dict) -> dict:
 
 def transform_practitioners(resources: list[dict]) -> list[dict]:
 
-    logger.info(f"Starting transformation of {len(resources)} Practitioner resources")
-
     results = []
 
     for resource in resources:
@@ -51,7 +49,5 @@ def transform_practitioners(resources: list[dict]) -> list[dict]:
                 f"Failed to transform Practitioner {resource.get('id', 'unknown')}"
             )
             raise
-
-    logger.info(f"Practitioner transformation finished: {len(results)} transformed")
 
     return results

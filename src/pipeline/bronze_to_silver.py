@@ -12,11 +12,11 @@ from src.extraction.extract_from_bronze import (
     extract_resources,
 )
 from src.loading.load_to_silver import load_to_silver
-
-# from src.transforms.observation import transform_observations
 from src.transforms.condition import transform_conditions
 from src.transforms.encounter import transform_encounters
 from src.transforms.medication_request import transform_medication_requests
+from src.transforms.observation import transform_observations
+from src.transforms.observation_component import transform_observation_components
 from src.transforms.organization import transform_organizations
 from src.transforms.patient import transform_patients
 from src.transforms.practitioner import transform_practitioners
@@ -28,24 +28,31 @@ logger = logging.getLogger(__name__)
 BATCH_SIZE = 500
 
 
-def process_organizations(container_client: ContainerClient, organization_blob: str):
-    organization_bundle = extract_bundle(container_client, organization_blob)
-    raw_organizations = extract_resources(organization_bundle, "Organization")
-    valid_organizations = validation(raw_organizations)
-    clean_organizations = transform_organizations(valid_organizations)
-    return clean_organizations
+def silver_blob_exists(
+    container_client: ContainerClient,
+    blob_name: str,
+) -> bool:
+    blob_client = container_client.get_blob_client(blob_name)
+    return blob_client.exists()
 
 
-def process_practitioners(container_client: ContainerClient, practitioner_blob: str):
-    practitioner_bundle = extract_bundle(container_client, practitioner_blob)
-    raw_practitioners = extract_resources(practitioner_bundle, "Practitioner")
-    valid_practitioners = validation(raw_practitioners)
-    clean_practitioners = transform_practitioners(valid_practitioners)
-    return clean_practitioners
+def process_single_resource_file(
+    container_client: ContainerClient,
+    blob_name: str,
+    resource_type: str,
+    transform_func: Callable[[list[dict]], list[dict]],
+) -> list[dict]:
+    bundle = extract_bundle(container_client, blob_name)
+    raw_resources = extract_resources(bundle, resource_type)
+    valid_resources = validation(raw_resources)
+    clean_resources = transform_func(valid_resources)
+    return clean_resources
 
 
 def process_resources(
-    bundle: dict, resource_type: str, transform_func: Callable[[list[dict]], list[dict]]
+    bundle: dict,
+    resource_type: str,
+    transform_func: Callable[[list[dict]], list[dict]],
 ) -> tuple[list[dict], int, int]:
     resources = extract_resources(bundle, resource_type)
     valid_resources = validation(resources)
@@ -83,15 +90,16 @@ def log_and_load_batch(
 
 
 def main():
-    """
-    NEED TO LOOK INTO OBSERVATION MORE
-    """
     setup_logging("bronze_to_silver.log")
+
     account_url = "https://syntheagendata.blob.core.windows.net"
     container_name = "lake"
 
     credential = DefaultAzureCredential()
-    blob_service_client = BlobServiceClient(account_url, credential=credential)
+    blob_service_client = BlobServiceClient(
+        account_url,
+        credential=credential,
+    )
 
     try:
         container_client = blob_service_client.get_container_client(
@@ -105,27 +113,55 @@ def main():
     organization_blob = "bronze/hospitalInformation1790018762251.json"
     practitioner_blob = "bronze/practitionerInformation1790018762251.json"
 
+    organization_silver_blob = "silver/organizations.parquet"
+    practitioner_silver_blob = "silver/practitioners.parquet"
+
     logger.info("Bronze to Silver ETL Started")
     logger.info(f"Found {len(all_patient_blob_names)} patient bundles in Bronze")
 
-    # process organizations - 1 file
-    load_to_silver(
-        blob_service_client,
-        container_name,
-        "silver/organizations.parquet",
-        process_organizations(container_client, organization_blob),
-    )
+    if not silver_blob_exists(
+        container_client,
+        organization_silver_blob,
+    ):
+        organizations = process_single_resource_file(
+            container_client,
+            organization_blob,
+            "Organization",
+            transform_organizations,
+        )
 
-    # process practitioners - 1 file
-    load_to_silver(
-        blob_service_client,
-        container_name,
-        "silver/practitioners.parquet",
-        process_practitioners(container_client, practitioner_blob),
-    )
+        load_to_silver(
+            blob_service_client,
+            container_name,
+            organization_silver_blob,
+            organizations,
+        )
+    else:
+        logger.info("Organization Silver data already exists - skipping")
+
+    if not silver_blob_exists(
+        container_client,
+        practitioner_silver_blob,
+    ):
+        practitioners = process_single_resource_file(
+            container_client,
+            practitioner_blob,
+            "Practitioner",
+            transform_practitioners,
+        )
+
+        load_to_silver(
+            blob_service_client,
+            container_name,
+            practitioner_silver_blob,
+            practitioners,
+        )
+    else:
+        logger.info("Practitioner Silver data already exists - skipping")
 
     for batch_number, start in enumerate(
-        range(0, len(all_patient_blob_names), BATCH_SIZE), start=1
+        range(0, len(all_patient_blob_names), BATCH_SIZE),
+        start=1,
     ):
         batch = all_patient_blob_names[start : start + BATCH_SIZE]
 
@@ -133,14 +169,15 @@ def main():
 
         batch_patients = []
         batch_encounters = []
-        # batch_observations = []
+        batch_observations = []
+        batch_observation_components = []
         batch_conditions = []
         batch_procedures = []
         batch_medication_requests = []
 
         patient_passed, patient_failed = 0, 0
         encounter_passed, encounter_failed = 0, 0
-        # observation_passed, observation_failed = 0, 0
+        observation_passed, observation_failed = 0, 0
         condition_passed, condition_failed = 0, 0
         procedure_passed, procedure_failed = 0, 0
         medication_requests_passed, medication_requests_failed = 0, 0
@@ -149,44 +186,62 @@ def main():
             bundle = extract_bundle(container_client, blob_name)
 
             patients, passed, failed = process_resources(
-                bundle, "Patient", transform_patients
+                bundle,
+                "Patient",
+                transform_patients,
             )
             batch_patients.extend(patients)
             patient_passed += passed
             patient_failed += failed
 
             encounters, passed, failed = process_resources(
-                bundle, "Encounter", transform_encounters
+                bundle,
+                "Encounter",
+                transform_encounters,
             )
             batch_encounters.extend(encounters)
             encounter_passed += passed
             encounter_failed += failed
 
-            # observations, passed, failed = process_resources(
-            #     bundle,
-            #     "Observation",
-            #     transform_observations
-            # )
-            # batch_observations.extend(observations)
-            # observation_passed += passed
-            # observation_failed += failed
+            observation_resources = extract_resources(
+                bundle,
+                "Observation",
+            )
+            valid_observations = validation(observation_resources)
+
+            observation_passed += len(valid_observations)
+            observation_failed += len(observation_resources) - len(valid_observations)
+
+            clean_observations = transform_observations(valid_observations)
+            batch_observations.extend(clean_observations)
+
+            clean_observation_components = transform_observation_components(
+                valid_observations
+            )
+            batch_observation_components.extend(clean_observation_components)
 
             conditions, passed, failed = process_resources(
-                bundle, "Condition", transform_conditions
+                bundle,
+                "Condition",
+                transform_conditions,
             )
             batch_conditions.extend(conditions)
             condition_passed += passed
             condition_failed += failed
 
             procedures, passed, failed = process_resources(
-                bundle, "Procedure", transform_procedures
+                bundle,
+                "Procedure",
+                transform_procedures,
             )
             batch_procedures.extend(procedures)
             procedure_passed += passed
             procedure_failed += failed
 
             medication_requests, passed, failed = process_resources(
-                bundle, "MedicationRequest", transform_medication_requests
+                bundle,
+                "MedicationRequest",
+                transform_medication_requests,
             )
             batch_medication_requests.extend(medication_requests)
             medication_requests_passed += passed
@@ -214,16 +269,32 @@ def main():
             batch_number,
         )
 
-        # log_and_load_batch(
-        #    blob_service_client,
-        #    container_name,
-        #    "Observation",
-        #    "observations",
-        #    batch_observations,
-        #    observation_passed,
-        #    observation_failed,
-        #    batch_number,
-        # )
+        log_and_load_batch(
+            blob_service_client,
+            container_name,
+            "Observation",
+            "observations",
+            batch_observations,
+            observation_passed,
+            observation_failed,
+            batch_number,
+        )
+
+        logger.info(
+            f"ObservationComponent transformation: "
+            f"{len(batch_observation_components)} transformed"
+        )
+
+        load_to_silver(
+            blob_service_client,
+            container_name,
+            f"silver/observation_components/part-{batch_number:04d}.parquet",
+            batch_observation_components,
+        )
+
+        logger.info(
+            f"Loaded {len(batch_observation_components)} ObservationComponent records"
+        )
 
         log_and_load_batch(
             blob_service_client,
@@ -250,13 +321,15 @@ def main():
         log_and_load_batch(
             blob_service_client,
             container_name,
-            "Medication Request",
+            "MedicationRequest",
             "medication_requests",
             batch_medication_requests,
             medication_requests_passed,
             medication_requests_failed,
             batch_number,
         )
+
+        logger.info(f"Batch {batch_number:04d} finished")
 
 
 if __name__ == "__main__":

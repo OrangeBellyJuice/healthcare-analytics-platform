@@ -25,8 +25,6 @@ def transform_organization(resource: dict) -> dict:
 
 def transform_organizations(resources: list[dict]) -> list[dict]:
 
-    logger.info(f"Starting transformation of {len(resources)} Organization resources")
-
     results = []
 
     for resource in resources:
@@ -39,7 +37,5 @@ def transform_organizations(resources: list[dict]) -> list[dict]:
                 f"Failed to transform Organization {resource.get('id', 'unknown')}"
             )
             raise
-
-    logger.info(f"Organization transformation finished: {len(results)} transformed")
 
     return results
