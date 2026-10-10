@@ -1,4 +1,5 @@
 import logging
+import time
 from collections.abc import Callable
 from functools import partial
 from pathlib import Path
@@ -50,20 +51,36 @@ def upload_files(
 
 
 def upload_blob_file(
-    blob_service_client: BlobServiceClient, container_name: str, file_path: Path
+    blob_service_client: BlobServiceClient,
+    container_name: str,
+    file_path: Path,
+    max_retries=3,
 ) -> None:
-
-    try:
-        container_client = blob_service_client.get_container_client(
-            container=container_name
-        )
-
-        with file_path.open("rb") as data:
-            container_client.upload_blob(
-                name=f"bronze/{file_path.name}", data=data, overwrite=True
+    for attempt in range(1, max_retries + 1):
+        try:
+            container_client = blob_service_client.get_container_client(
+                container=container_name
             )
-    except (AzureError, OSError) as e:
-        raise UploadError(f"Failed to upload {file_path.name} - {e}") from e
+
+            with file_path.open("rb") as data:
+                container_client.upload_blob(
+                    name=f"bronze/{file_path.name}",
+                    data=data,
+                    overwrite=True,
+                )
+
+            return
+
+        except (AzureError, OSError, TimeoutError) as e:
+            if attempt == max_retries:
+                raise UploadError(f"Failed to upload {file_path.name} - {e}") from e
+
+            logger.warning(
+                f"{file_path.name} upload attempt "
+                f"{attempt}/{max_retries} failed - retrying"
+            )
+
+            time.sleep(2 * attempt)
 
 
 def main():

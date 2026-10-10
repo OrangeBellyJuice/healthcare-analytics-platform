@@ -1,9 +1,8 @@
 import logging
 import re
-from json import JSONDecodeError, loads
+from json import loads
 
-from azure.core.exceptions import AzureError
-from azure.storage.blob import BlobServiceClient, ContainerClient
+from azure.storage.blob import ContainerClient
 
 logger = logging.getLogger(__name__)
 
@@ -28,4 +27,3 @@ def extract_resources(bundle: dict, resource_type: str) -> list[dict]:
         for entry in bundle["entry"]
         if entry["resource"]["resourceType"] == resource_type
     ]
-
