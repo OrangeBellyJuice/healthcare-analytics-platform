@@ -217,6 +217,46 @@ valid_observation = {
     },
 }
 
+valid_coded_observation = {
+    "resourceType": "Observation",
+    "id": "94697183-8162-51cb-2b7c-2d93157ba875",
+    "status": "final",
+    "category": [
+        {
+            "coding": [
+                {
+                    "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                    "code": "social-history",
+                    "display": "Social history",
+                }
+            ]
+        }
+    ],
+    "code": {
+        "coding": [
+            {
+                "system": "http://loinc.org",
+                "code": "72166-2",
+                "display": "Tobacco smoking status",
+            }
+        ],
+        "text": "Tobacco smoking status",
+    },
+    "subject": {"reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"},
+    "encounter": {"reference": "urn:uuid:94697183-8162-51cb-d5a1-40d07064b4e1"},
+    "effectiveDateTime": "2016-10-12T16:44:44-07:00",
+    "issued": "2016-10-12T16:44:44.253-07:00",
+    "valueCodeableConcept": {
+        "coding": [
+            {
+                "system": "http://snomed.info/sct",
+                "code": "266919005",
+                "display": "Never smoked tobacco (finding)",
+            }
+        ],
+        "text": "Never smoked tobacco (finding)",
+    },
+}
 
 valid_procedure = {
     "resourceType": "Procedure",
@@ -246,6 +286,72 @@ valid_procedure = {
     ],
 }
 
+valid_component_observation = {
+    "resourceType": "Observation",
+    "id": "94697183-8162-51cb-1249-ce8a923a40f1",
+    "status": "final",
+    "category": [
+        {
+            "coding": [
+                {
+                    "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                    "code": "vital-signs",
+                    "display": "Vital signs",
+                }
+            ]
+        }
+    ],
+    "code": {
+        "coding": [
+            {
+                "system": "http://loinc.org",
+                "code": "85354-9",
+                "display": "Blood pressure panel with all children optional",
+            }
+        ],
+        "text": "Blood pressure panel with all children optional",
+    },
+    "subject": {"reference": "urn:uuid:94697183-8162-51cb-016a-7aaefbb845ba"},
+    "encounter": {"reference": "urn:uuid:94697183-8162-51cb-d5a1-40d07064b4e1"},
+    "effectiveDateTime": "2016-10-12T16:44:44-07:00",
+    "issued": "2016-10-12T16:44:44.253-07:00",
+    "component": [
+        {
+            "code": {
+                "coding": [
+                    {
+                        "system": "http://loinc.org",
+                        "code": "8462-4",
+                        "display": "Diastolic Blood Pressure",
+                    }
+                ]
+            },
+            "valueQuantity": {
+                "value": 68,
+                "unit": "mm[Hg]",
+                "system": "http://unitsofmeasure.org",
+                "code": "mm[Hg]",
+            },
+        },
+        {
+            "code": {
+                "coding": [
+                    {
+                        "system": "http://loinc.org",
+                        "code": "8480-6",
+                        "display": "Systolic Blood Pressure",
+                    }
+                ]
+            },
+            "valueQuantity": {
+                "value": 111,
+                "unit": "mm[Hg]",
+                "system": "http://unitsofmeasure.org",
+                "code": "mm[Hg]",
+            },
+        },
+    ],
+}
 
 valid_medication_request = {
     "resourceType": "MedicationRequest",
@@ -305,7 +411,79 @@ def test_valid_observation_passes_validation():
     assert result.resourceType == "Observation"
     assert result.status == "final"
     assert result.code.coding[0].code == "8302-2"
+    assert result.valueQuantity is not None
     assert result.valueQuantity.value == 56.6
+
+
+def test_coded_observation_passes_validation():
+    result = Observation.model_validate(valid_coded_observation)
+
+    assert result.valueCodeableConcept is not None
+    assert result.valueCodeableConcept.coding[0].code == "266919005"
+    assert result.valueCodeableConcept.text == ("Never smoked tobacco (finding)")
+
+
+def test_component_observation_passes_validation():
+    result = Observation.model_validate(valid_component_observation)
+
+    assert result.component is not None
+    assert len(result.component) == 2
+
+    assert result.component[0].code.coding[0].code == "8462-4"
+    assert result.component[0].valueQuantity is not None
+    assert result.component[0].valueQuantity.value == 68
+
+    assert result.component[1].code.coding[0].code == "8480-6"
+    assert result.component[1].valueQuantity is not None
+    assert result.component[1].valueQuantity.value == 111
+
+
+def test_observation_component_with_string_value_passes_validation():
+    component = {
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "56799-0",
+                    "display": "Address",
+                }
+            ]
+        },
+        "valueString": "851 Barton Ferry",
+    }
+
+    result = ObservationComponent.model_validate(component)
+
+    assert result.valueString == "851 Barton Ferry"
+
+
+def test_observation_component_with_coded_value_passes_validation():
+    component = {
+        "code": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "67875-5",
+                    "display": "Employment status - current",
+                }
+            ]
+        },
+        "valueCodeableConcept": {
+            "coding": [
+                {
+                    "system": "http://loinc.org",
+                    "code": "LA17956-6",
+                    "display": "Unemployed",
+                }
+            ],
+            "text": "Unemployed",
+        },
+    }
+
+    result = ObservationComponent.model_validate(component)
+
+    assert result.valueCodeableConcept is not None
+    assert result.valueCodeableConcept.coding[0].code == "LA17956-6"
 
 
 def test_valid_procedure_passes_validation():

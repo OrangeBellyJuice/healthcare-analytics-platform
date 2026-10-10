@@ -32,28 +32,6 @@ class Quantity(BaseModel):
     code: str | None = None
 
 
-class ObservationComponent(BaseModel):
-    code: CodeableConcept
-    valueQuantity: Quantity | None = None
-    valueCodeableConcept: CodeableConcept | None = None
-    valueString: str | None = None
-
-
-class Observation(BaseModel):
-    resourceType: Literal["Observation"]
-    id: str
-    status: str
-    category: list[CodeableConcept]
-    code: CodeableConcept
-    subject: Reference
-    encounter: Reference
-    effectiveDateTime: datetime
-    issued: datetime
-    valueQuantity: Quantity | None = None
-    valueCodeableConcept: CodeableConcept | None = None
-    component: list[ObservationComponent] | None = None
-
-
 class MedicationTimingRepeat(BaseModel):
     frequency: int | None = None
     period: float | None = None
@@ -114,7 +92,30 @@ class Condition(BaseModel):
     abatementDateTime: datetime | None = None
     recordedDate: datetime
 
-# INTSERT OBSERVATIONS HERE
+
+class ObservationComponent(BaseModel):
+    code: CodeableConcept
+    valueQuantity: Quantity | None = None
+    valueCodeableConcept: CodeableConcept | None = None
+    valueString: str | None = None
+
+
+class Observation(BaseModel):
+    resourceType: Literal["Observation"]
+    id: str
+    status: str
+    category: list[CodeableConcept]
+    code: CodeableConcept
+    subject: Reference
+    encounter: Reference
+    effectiveDateTime: datetime
+    issued: datetime
+    valueQuantity: Quantity | None = None
+    valueCodeableConcept: CodeableConcept | None = None
+    valueString: str | None = None
+    component: list[ObservationComponent] | None = None
+
+
 class EncounterParticipant(BaseModel):
     individual: Reference
 

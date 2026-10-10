@@ -1,5 +1,5 @@
 from src.transforms.observation import (
-    extract_component_quantity,
+    extract_observation_value,
     extract_reference_id,
     transform_observation,
 )
@@ -158,6 +158,16 @@ def test_extract_reference_id():
     assert extract_reference_id(reference) == ("94697183-8162-51cb-016a-7aaefbb845ba")
 
 
+def test_extract_quantity_value():
+    result = extract_observation_value(quantity_observation)
+
+    assert result["value"] == 56.6
+    assert result["unit"] == "cm"
+    assert result["value_code"] is None
+    assert result["value_text"] is None
+    assert result["value_type"] == "quantity"
+
+
 def test_transform_quantity_observation():
     results = transform_observation(quantity_observation)
 
@@ -171,9 +181,19 @@ def test_transform_quantity_observation():
     assert results["observation"] == "Body Height"
     assert results["value"] == 56.6
     assert results["unit"] == "cm"
-    assert results["coded_value"] is None
-    assert results["systolic_value"] is None
-    assert results["diastolic_value"] is None
+    assert results["value_code"] is None
+    assert results["value_text"] is None
+    assert results["value_type"] == "quantity"
+
+
+def test_extract_coded_value():
+    result = extract_observation_value(coded_observation)
+
+    assert result["value"] is None
+    assert result["unit"] is None
+    assert result["value_code"] == "266919005"
+    assert result["value_text"] == "Never smoked tobacco (finding)"
+    assert result["value_type"] == "codeable_concept"
 
 
 def test_transform_coded_observation():
@@ -183,30 +203,19 @@ def test_transform_coded_observation():
     assert results["observation"] == "Tobacco smoking status"
     assert results["value"] is None
     assert results["unit"] is None
-    assert results["coded_value_code"] == "266919005"
-    assert results["coded_value"] == "Never smoked tobacco (finding)"
+    assert results["value_code"] == "266919005"
+    assert results["value_text"] == "Never smoked tobacco (finding)"
+    assert results["value_type"] == "codeable_concept"
 
 
-def test_extract_blood_pressure_components():
-    systolic, systolic_unit = extract_component_quantity(
-        blood_pressure_observation["component"],
-        "8480-6",
-    )
-    diastolic, diastolic_unit = extract_component_quantity(
-        blood_pressure_observation["component"],
-        "8462-4",
-    )
-
-    assert systolic == 111
-    assert systolic_unit == "mm[Hg]"
-    assert diastolic == 68
-    assert diastolic_unit == "mm[Hg]"
-
-
-def test_transform_blood_pressure_observation():
+def test_transform_component_only_observation():
     results = transform_observation(blood_pressure_observation)
 
     assert results["observation_code"] == "85354-9"
-    assert results["systolic_value"] == 111
-    assert results["diastolic_value"] == 68
-    assert results["blood_pressure_unit"] == "mm[Hg]"
+    assert results["observation"] == ("Blood pressure panel with all children optional")
+
+    assert results["value"] is None
+    assert results["unit"] is None
+    assert results["value_code"] is None
+    assert results["value_text"] is None
+    assert results["value_type"] is None
