@@ -6,6 +6,7 @@ from src.validations.models import (
     Encounter,
     MedicationRequest,
     Observation,
+    ObservationComponent,
     Organization,
     Patient,
     Practitioner,
