@@ -96,10 +96,8 @@ practitioner file, and 1 organization file all in FHIR format of JSON  type.
 
 #### FHIR format
 
-\!\!\!\[+ *discuss stuff here about FHIR and healthcare format standards
-&nbsp;  
-\!\!\!\
-[+ probably want to make a outline picture of what the structure of the JSON object looks like \+\]
+[ *discuss stuff here about FHIR and healthcare format standards* ] \
+[ probably want to make a outline picture of what the structure of the JSON object looks like ]
 
 ## Business Questions
 
@@ -114,14 +112,13 @@ of questions revolving around healthcare utilization and patient groups.
 By picking a subject we can then ask more refined question/problem and then from
 there ask sub questions:
 
-#### Business Problem
+### Business Problem
 
 > **How do chronic disease burden and multi-morbidity affect healthcare utilization,
   and which patient groups exhibit patterns of repeated acure-care use?**
 
 So from this it is easier to come up with sub questions and look back at the data
-and see what we can use for this analysis without using all the data and adding
-as we see fit.
+and see what we can use for this analysis and adding more as we see fit.
 
 | Business question | Analytical question | Why the organization cares |
 | --- | --- | --- |
@@ -160,9 +157,9 @@ Now we can disclose what entries we are going to use in the patient bundles.
 // * -> being used in analysis
 ```
 
-\!\!\!\[+ *discuss stuff here about which fields we took from each one of these fields, consider putting in seperate file with link* \+\]
+[+ *discuss stuff here about which fields we took from each one of these fields, consider putting in seperate file with link* ]
 
-## Let the Ingestion Begin\! \- logging, timeout, azure code, azure permissions
+## Let the Ingestion Begin!
 
 This is the first test and script file I made. I already had the data and this
 was just a matter of putting the files into the bronze layer on Azure Data Lake
@@ -170,25 +167,57 @@ Storage Gen2. The first hard part is how we are actually going to connect to Azu
 from our computer. While anything Microsoft is not my cup of tea, I will give
 them this, their documents for their services are actually good.
 
-## Tech Stack \- python, libraries, azure, power bi, quatro MIGHT NOT NEED THIS SEE BELOW, MAIN README WILL HAVE
+### Azure Infrastructure
+### Timeouts
+### Azure Permissions
 
-## Engineer Practices \- TDD, version control, data validation, dev-environment medallion?
+## Tech Stack
+- python
+- pytest, pandas, and pydantic
+- azure
+- quatro
+- power bi
+- power point?
+
+## Engineer Practices
 
 ### Test-driven development
 
-*maybe right about fakers and mocks too*
+```mermaid
+graph TD 
+    A["Write pytest Test"] -->|pytest fails| B["Write Code"]
+    B -->|Run pytest| C{"Tests Pass?"}
+    C -->|No| B
+    C -->|Yes| D["Refactor Code"]
+    D -->|Run pytest| E{"Tests Still Pass?"}
+    E -->|No| D
+    E -->|Yes| F["Code Complete"]
+    F -->|Next test| A
+
+    classDef testPhase stroke:#f87171,fill:#fef2f2
+    classDef codePhase stroke:#38bdf8,fill:#f0f9ff
+    classDef refactorPhase stroke:#4ade80,fill:#f0fdf4
+    classDef decision stroke:#facc15,fill:#fefce8
+    classDef complete stroke:#a78bfa,fill:#f5f3ff
+
+    class A testPhase
+    class B codePhase
+    class D refactorPhase
+    class C,E decision
+    class F complete
+```
+
+*maybe right about faers and mocks too*
 
 > *If you can't write a unit test, don't touch my pipelines*
 
-### Data validation
-
-### Docker development environment
+### Dependency injection/fake for Azure tests
 
 ### Logging
 
-### Error handling
+### Docker development environment
 
-## Let the Ingestion Begin\! \- logging, timeout, azure code, azure permissions
+### Error handling
 
 ## Medallion \-  ETL, bronze, silver, and gold\!
 
