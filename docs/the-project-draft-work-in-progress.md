@@ -2,42 +2,40 @@
 
 ## Start
 
-The motivation for this project was to find data, ask questions that someone in
-the industry of the data would want to know, and then actually analyze the data
-in a way where we can answer business questions and make strategic decisions.
+The design for this project was to find data, ask questions that a business person
+in the industry of the data would want to know, and then actually analysis on it
+to answer those questions and also see what strategic decisions can be made.
 
-I was interested in doing a project at the scope that would be as close to being
-in a data analytics position in some industry. There is actually two hard challenges:
+I was interested in doing a project at the scope that would be as close as possible
+to being a data analyst in some industry. There are two challenges:
 
 - Finding a large data set  
-- Finding someone who has expertise in the domain the data is of
+- Finding someone who has expertise in the domain of the data
 
 You might ask why not start with a domain (finance, agriculture, labour, etc.)
 first and then find the appropriate data? That sounds like the sensible thing to
-do, but it is actually hard finding data sets that are large (\> 10GBs). Even
-when the big players - [government, big tech, and open source][datasets] -
-do not have that much in terms of size and if they do it is something that is of
-no interest of me.
+do, but it is actually hard finding data sets that are large (> 10GBs). Even
+the big players - [government, big tech, and open source][datasets] - do not have
+that much in terms of size and if they do it is something that is of no interest
+of me.
 
 Another point of contingency, is that since this a project out of my own interest,
 then the domain should be something of interest as well too. I would quickly find
 that there would be a tug-of-war battle between *size* and *domain*.
 
-I was interested in answering a question to do with some domain related to big
+I was interested in answering questions to do with some domain related to big
 industries in Canada, I started thinking about health care since there seems to
 be a lot of changes in the news and I know a few people who did the diploma
 version of my program and would end up working at the healthcare provider in my
 city. So that was that, I have my experts, but no data...
 
-Low and behold that getting healthcare data that is Canadian and you can analyse
-is basically impossible. I thought maybe there would be anonymized data, but no.
-On websites, such as [Government of Canada][gov] or
-[Canadian Institute for Health Information][cihi],
-you can find and download data, but it is clear from the output that it uses
-aggregated measures and cohort-level reporting. Furthermore, the data is specific
-to the report it is part of, not general purpose. In other words, raw and
-patient-level data is in restricted analytical layers. This is done to reduce
-disclosure and re-identification risks.
+Low and behold, getting healthcare data that is Canadian and you can analyse
+is basically impossible. On websites, such as [Government of Canada][gov] or
+[Canadian Institute for Health Information][cihi], you can find and download data,
+but it is clear from the output that it uses aggregated measures and cohort-level
+reporting. Furthermore, the data is specific to the report it is part of, not
+general purpose. In other words, raw and patient-level data is in restricted
+analytical layers. This is done to reduce disclosure risks and re-identification.
 
 At this point I was about to give up on doing something related to healthcare,
 but I ended up stumbling upon [Synthea][syn] which generates *synthetic* patient
@@ -48,14 +46,16 @@ population data where each patient comes with its own health records.
 ### The good, bad, and ugly
 
 Synthea is super cool, handy, and perhaps something maybe a healthcare provider
-may develop in house some day in Canada. It can output the files into several
-types, but I ultimately chose [FHIR](#fhir-format) because it is standard used
+may develop in house for data purposes. It can output the files into several
+types, but I ultimately chose [FHIR](#fhir-format) because it is a standard used
 in Canada.
 
 There was a glaring problem with Synthea... it is heavily US-based. However, I
 was able to find a linked repository called [Synthea International][synint]
 which allows you to change the location by downloading the appropriate files and
 overwriting the default US ones.
+
+### Discovery
 
 In `synthea/src/main/resources/` I had to change settings in order to output FHIR
 (JSON) files in the `synthea.properties` file. I noticed when scrolling through
@@ -65,9 +65,9 @@ Some of the file names end in `_ca` which came from the Canada folder from
 Synthea International.
 
 It hit me that I can create my own CSV files that have Canadian information in
-them, dump in folder, and then change the value in the properties to use that one
-instead. This is a tedious thing to do to find all this information myself so I
-used generative AI to make me the following files:
+them, dump them in the folder, and then change the value in the properties to use
+that one instead. This is a tedious thing to do to find all this information
+myself so I used generative AI to make me the following files:
 
 ```text
 rehab_ca.csv
@@ -77,12 +77,12 @@ home_health_agencies_ca.csv
 ```
 
 Just checked to make sure that they were similar to ones that were already there
-and had realistic enough data. Then in the properties files you would just change
-the file it uses:
+and had realistic enough data. Then in the properties file I just changed the
+file it uses:
 
 ```jsonc
 generate.providers.rehab.default_file = providers/rehab_ca.csv  
-// was rehab.csv before with US stuff
+// was providers/rehab.csv before which has US data
 ```
 
 Command to run inside synthea folder to generate data:
@@ -92,33 +92,36 @@ Command to run inside synthea folder to generate data:
 ```
 
 Output: A folder in `synthea/output/` called `fhir` with 17,451 patient files, 1
-practitioner file, and 1 organization file all in FHIR format of JSON  type.
+practitioner file, and 1 organization file all in FHIR format of JSON type.
 
 #### FHIR format
 
 [ *discuss stuff here about FHIR and healthcare format standards* ] \
-[ probably want to make a outline picture of what the structure of the JSON object looks like ]
+[ probably want to make a outline picture of what the structure of the JSON object
+looks like ]
 
 ## Business Questions
 
 After creating the data, I wanted to inspect some of the patient files to see what
-information we got and turns out we got a lot. Each patient bundle has up to 17
-unique fields with some also having nested data. Inspecting the data and coming
-up questions actually became a long and lengthy process. At first I became really
-distressed because it was too much information and we could have so many diverse
-types of questions we can ask on the data, but instead I chose to go with a theme
-of questions revolving around healthcare utilization and patient groups.
+information we got and it turns out we got a lot. Each patient bundle has up to
+17 unique fields with some also having nested data. Inspecting the data and coming
+up with questions actually became a long and lengthy process. It is really over-
+whelming because it was too much information and I could in many directions with
+the types of questions I can ask about the data, but instead I chose to go with
+a subject of questions revolving around healthcare utilization and patient groups.
 
-By picking a subject we can then ask more refined question/problem and then from
-there ask sub questions:
+By picking a subject we can then ask a more refined question/problem and then from
+there ask several sub questions:
 
 ### Business Problem
 
 > **How do chronic disease burden and multi-morbidity affect healthcare utilization,
-  and which patient groups exhibit patterns of repeated acure-care use?**
+  and which patient groups exhibit patterns of repeated acute-care use?**
 
-So from this it is easier to come up with sub questions and look back at the data
-and see what we can use for this analysis and adding more as we see fit.
+From this, we can come up with sub questions and look back at the data and see
+what fields we can use and add more if we think it will help as well.
+
+<!-- markdownlint-disable MD013 -->
 
 | Business question | Analytical question | Why the organization cares |
 | --- | --- | --- |
@@ -133,23 +136,25 @@ and see what we can use for this analysis and adding more as we see fit.
 | **How are chronic diseases being managed over time?** | Track labs/vitals, medications and encounters for diabetes, hypertension, CKD, etc. | Supports longitudinal quality monitoring |
 | **Which patients transition to higher-support services?** | What clinical histories precede home care, hospice or other intensive services? | Supports planning for complex-care populations |
 
-Now we can disclose what entries we are going to use in the patient bundles.
+<!-- markdownlint-enable MD013 -->
+
+Here we disclose what entries we are going to use from the patient bundles.
 
 ```jsonc
 {
   'AllergyIntolerance': 15912, 
   'CarePlan': 59541, // investigate why these are the same...
   'CareTeam': 59541, // investigate why these are the same...
-  'Claim': 2026390, // may not use - too Americanised
+  'Claim': 2026390, // not useful - too American
   'Condition': 696285, // * 
   'Device': 106709, 
   'DiagnosticReport': 1105537, 
   'Encounter': 1084095, // * 
-  'ExplanationOfBenefit': 2026390, // may not use - too Americanised 
+  'ExplanationOfBenefit': 2026390, // not useful - too American 
   'ImagingStudy': 87422, 
   'Immunization': 246178, 
   'MedicationRequest': 942295, // * 
-  'Observation': 9736649, // * break this down because nested information 
+  'Observation': 9736649, // * break this down & get nested information 
   'Patient': 17451, // * 
   'Procedure': 2994872, // *
   'SupplyDelivery': 491954
@@ -157,9 +162,14 @@ Now we can disclose what entries we are going to use in the patient bundles.
 // * -> being used in analysis
 ```
 
-[+ *discuss stuff here about which fields we took from each one of these fields, consider putting in seperate file with link* ]
+[+ *discuss stuff here about which fields we took from each one of these resources,
+consider putting in seperate files like a data dictionary* ]
 
-## Let the Ingestion Begin!
+<!--
+    so far: ingestion -> bronze to silver::medallion -> silver to gold::up next
+-->
+
+## Let the Ingestion Begin
 
 This is the first test and script file I made. I already had the data and this
 was just a matter of putting the files into the bronze layer on Azure Data Lake
@@ -168,43 +178,105 @@ from our computer. While anything Microsoft is not my cup of tea, I will give
 them this, their documents for their services are actually good.
 
 ### Azure Infrastructure
+
 ### Timeouts
+
 ### Azure Permissions
 
 ## Tech Stack
-- python
-- pytest, pandas, and pydantic
-- azure
-- quatro
-- power bi
-- power point?
+
+- python: script language
+  - pytest: testing
+  - pandas: data processing
+  - pydantic: data validation
+- azure: data storage and database
+- quatro: report publishing
+- power bi: data dashboard
+- power point: business slides
 
 ## Engineer Practices
 
 ### Test-driven development
 
-<p align="center">
-  <img src="docs/tdd.svg" alt="Test-driven development cycle" width="450">
-</p>
+```mermaid
+graph LR
+    A["Red: Write pytest Test"] -->|pytest fails| B["Green: Write Code"]
+    B -->|Run pytest| C{"Tests Pass?"}
+    C -->|No| B
+    C -->|Yes| D["Refactor: Improve Code"]
+    D -->|Run pytest| E{"Tests Still Pass?"}
+    E -->|No| D
+    E -->|Yes| F["Code Complete"]
+    F -->|Next test| A
 
-*maybe right about faers and mocks too*
+    classDef testPhase stroke:#f87171,fill:#fef2f2
+    classDef codePhase stroke:#38bdf8,fill:#f0f9ff
+    classDef refactorPhase stroke:#4ade80,fill:#f0fdf4
+    classDef decision stroke:#facc15,fill:#fefce8
+    classDef complete stroke:#a78bfa,fill:#f5f3ff
 
-> *If you can't write a unit test, don't touch my pipelines*
+    class A testPhase
+    class B codePhase
+    class D refactorPhase
+    class C,E decision
+    class F complete
+```
+
+> *"If you can't write a unit test, don't come near my data pipelines" - professor*
+
+I had done [TDD][article] in my 2nd year capstone (TypeScript + Chai + Mocha) project
+and I wanted to continue improving this skill. There is so much about testing that
+I have not fully understood or done yet - mocks, spies, end-to-end integration,
+etc. It is important to the quality of the project that the data pipelines are
+easy to reason about, safe to refactor, and robust against irregularities in the
+nested FHIR data.
 
 ### Dependency injection/fake for Azure tests
 
+One of the confusing tests that I had to wrap my head around was *Fakes*. I got
+stuck here in thinking how do you test the cloud, but in reality I just needed to
+understand the behaviour of what the service is doing. So what are we doing with
+the data?
+
+When we upload data into Azure for ingestion we are simply storing it. So we
+just need to implement a *fake* storage that behaves like the one in our cloud.
+I had generative AI help me at this step because I am not well versed in Python
+object orientated programming (a.k.a POOP). None the less, we can verify storage
+upload and behaviour and that is exactly what we wanted. Also, by testing the
+infrastructure code from the transformation behaviour we gave ourselves a bonus
+of reduced coupling between the systems.
+
 ### Logging
+
+There is something about having several files that need to coordinate with one another,
+but we can not see the coordination happening. It becomes really difficult to observe
+the pipeline in action or even trace where errors happen. This is why I wanted
+to add logging and Python already has a good library built-in. I want to log the
+major steps happening, warnings, and errors. I do not need to see every successful
+action because that log file will get big with unnecessary information.
+
+A lot of thought was given to where to put the logging and how to set it up. I
+was able to do this through reading docs, googling around about best practices,
+and doing test runs with a small batch of files. Another thing is that a pipeline
+(or any software for that matter) is not production-like if you have to sit
+around staring at the terminal to see things happening. I should be able to run
+my pipeline and comeback to it once it is finished and inspect the logs to see if
+something happened and figure out why.
 
 ### Docker development environment
 
-### Error handling
+I wanted to create an isolated and reproducable environment so I can work on it
+from both my laptop and PC. I did not want environment-specific issues which I
+was already having on my laptop anyways. The goal with the container was to keep
+it light weight and use it as a runtime so that way I can keep using my workflow
+setup (Neovim + Git) on my host device. I had to generate some keys from Azure that
+live on my machine that the container reads in order to connect and interact with
+Azure.
 
-## Medallion \-  ETL, bronze, silver, and gold\!
-
-&nbsp;
 
 [datasets]: https://github.com/DataTalksClub/data-engineering-zoomcamp/blob/main/projects/datasets.md
 [gov]: https://www.canada.ca/en/services/health/data.html
 [cihi]: https://www.cihi.ca/en
 [syn]: https://github.com/synthetichealth/synthea
 [synint]: https://github.com/synthetichealth/synthea-international/tree/master
+[article]: https://martinfowler.com/bliki/TestDrivenDevelopment.html
