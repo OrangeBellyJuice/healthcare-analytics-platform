@@ -198,20 +198,7 @@ them this, their documents for their services are actually good.
 
 ### Test-driven development
 
-<picture>
-  <source
-    media="(prefers-color-scheme: dark)"
-    srcset="../imgs/tdd-dark.svg"
-  >
-  <source
-    media="(prefers-color-scheme: light)"
-    srcset="../imgs/tdd-light.svg"
-  >
-  <img
-    src="../imgs/tdd-light.svg"
-    alt="Test-driven development workflow"
-  >
-</picture>
+![Test-driven development workflow](../imgs/tdd.svg)
 
 > *"If you can't write a unit test, don't come near my data pipelines" - professor*
 
