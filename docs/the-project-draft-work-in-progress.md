@@ -198,29 +198,20 @@ them this, their documents for their services are actually good.
 
 ### Test-driven development
 
-```mermaid
-graph LR
-    A["Red: Write pytest Test"] -->|pytest fails| B["Green: Write Code"]
-    B -->|Run pytest| C{"Tests Pass?"}
-    C -->|No| B
-    C -->|Yes| D["Refactor: Improve Code"]
-    D -->|Run pytest| E{"Tests Still Pass?"}
-    E -->|No| D
-    E -->|Yes| F["Code Complete"]
-    F -->|Next test| A
-
-    classDef testPhase stroke:#f87171,fill:#fef2f2
-    classDef codePhase stroke:#38bdf8,fill:#f0f9ff
-    classDef refactorPhase stroke:#4ade80,fill:#f0fdf4
-    classDef decision stroke:#facc15,fill:#fefce8
-    classDef complete stroke:#a78bfa,fill:#f5f3ff
-
-    class A testPhase
-    class B codePhase
-    class D refactorPhase
-    class C,E decision
-    class F complete
-```
+<picture>
+  <source
+    media="(prefers-color-scheme: dark)"
+    srcset="../imgs/tdd-dark.svg"
+  >
+  <source
+    media="(prefers-color-scheme: light)"
+    srcset="../imgs/tdd-light.svg"
+  >
+  <img
+    src="../imgs/tdd-light.svg"
+    alt="Test-driven development workflow"
+  >
+</picture>
 
 > *"If you can't write a unit test, don't come near my data pipelines" - professor*
 
